@@ -25,6 +25,12 @@ liboga_proto_json_la_SOURCES=\
 	json_parser.cpp \
 	$(NULL)
 
+liboga_proto_json_la_SOURCES+=\
+	json.hpp \
+	json_generator.hpp \
+	json_parser.hpp \
+	$(NULL)
+
 noinst_PROGRAMS=json_test
 
 json_test_SOURCES=main.cpp

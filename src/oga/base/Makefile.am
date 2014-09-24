@@ -26,3 +26,12 @@ liboga_base_la_SOURCES=\
 	logging_formatter.cpp \
 	logging_logger.cpp \
 	$(NULL)
+
+
+liboga_base_la_SOURCES+=\
+	error_def.hpp \
+	errors.hpp \
+	logging_appender.hpp \
+	logging.hpp \
+	types.hpp \
+	$(NULL)

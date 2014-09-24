@@ -47,5 +47,6 @@ AC_CONFIG_FILES([
     src/oga/comm/Makefile
     src/oga/proto/Makefile
     src/oga/proto/json/Makefile
+    src/oga/util/Makefile
 ])
 AC_OUTPUT

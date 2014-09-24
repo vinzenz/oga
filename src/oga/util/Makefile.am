@@ -16,17 +16,9 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-noinst_LTLIBRARIES = liboga-comm.la
-
-liboga_comm_la_CXXFLAGS=$(AM_CXXFLAGS) $(OGA_CXX_FLAGS)
-liboga_comm_la_SOURCES=\
-	connection.cpp \
-	detail/connection_linux.cpp \
-	detail/connection_windows.cpp \
-	$(NULL)
-
-liboga_comm_la_SOURCES+=\
-	connection.hpp \
-	detail/connection_linux.hpp \
-	detail/connection_windows.hpp \
+EXTRA_DIST=\
+	encoding.hpp \
+	shared_ptr.hpp \
+	split.hpp \
+	string_appender.hpp \
 	$(NULL)

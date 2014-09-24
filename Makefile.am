@@ -22,3 +22,5 @@ ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I m4
 SUBDIRS=src
 
 dist_noinst_SCRIPTS = autogen.sh
+
+EXTRA_DIST=ext
