@@ -123,4 +123,14 @@ std::string error_type::message() const {
     return category().message(code());
 }
 
+
+void raise_oga_error(error_type const & e) {
+    throw oga_error(e);
+}
+
+void raise_on_failure(error_type const & e) {
+    if(e.code() != 0) {
+        raise_oga_error(e);
+    }
+}
 }

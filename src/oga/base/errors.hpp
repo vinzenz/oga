@@ -21,6 +21,7 @@
 
 #include <string>
 #include <oga/base/types.hpp>
+#include <stdexcept>
 
 namespace oga {
 
@@ -63,6 +64,22 @@ error_type get_last_system_error();
 
 error_type app_error(int32_t code, error_severity sev = kESevError);
 error_type sys_error(int32_t code, error_severity sev = kESevError);
+
+class oga_error : public std::runtime_error {
+    error_type error_;
+public:
+    oga_error(error_type const & e)
+    : std::runtime_error(e.message())
+    , error_(e)
+    {}
+
+    error_type const & error() const {
+        return error_;
+    }
+};
+
+void raise_oga_error(error_type const & e);
+void raise_on_failure(error_type const & e);
 
 }
 

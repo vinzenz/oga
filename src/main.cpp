@@ -21,6 +21,7 @@
 #include <oga/proto/json/json_parser.hpp>
 #include <oga/base/logging.hpp>
 #include <stdio.h>
+#include <oga/base/process.hpp>
 
 static char const json_def[] = "{"
     "\"loggers\": {\"keys\": \"root\" },"
@@ -28,12 +29,12 @@ static char const json_def[] = "{"
     "\"handlers\": {\"keys\": \"logfile\"},"
     "\"handler_logfile\": {\"class\": \"rotating_file_appender\", \"formatter\": \"long\", \"path\": \"/tmp/oga2.log\", \"mode\": \"a+\"},"
     "\"formatters\": {\"keys\": \"long\"},"
-    "\"formatter_long\": {\"format\": \"%(threadName)s::%(levelname)s::%(asctime)s::%(module)s::%(lineno)d::%(name)s::%(message)s\"}"
+    "\"formatter_long\": {\"format\": \"[%(name)s]!%(levelname)s TID:%(tid)d PID:%(pid)d TS:%(asctime)s @%(module)s:%(lineno)d MSG:%(message)s\"}"
 "}";
 
 int main() {
+#if 0
     using namespace oga::comm;
-
     oga::proto::json::value config;
     parse(json_def, json_def + (sizeof(json_def) - 1), config);
     oga::log::configure(config.get_object(oga::log::config()));
@@ -58,4 +59,34 @@ int main() {
     else {
         printf("Connect result: %d - %s\n", err.code(), err.message().c_str());
     }
+#endif
+#if defined(WIN32)
+    char const * args[] = {"C:\\windows\\system32\\cmd.exe", "/C", "echo foobar"};
+#else
+    char const *args[] = {"/bin/echo", "foobar"};
+#endif
+    std::vector<std::string> x(args, args + (sizeof(args) / sizeof(args[0])));
+    try
+    {
+        printf("Output: ");
+        fflush(stdout);
+        oga::popen p(x, "", oga::kPopenNone);
+        oga::raise_on_failure(p.wait());
+        // oga::raise_on_failure(p.read_stdout(v));
+    }
+    catch(oga::oga_error const & e) {
+        printf("Failed to start process: %d - %s\n", e.error().code(), e.what());
+    }
+    try
+    {
+        oga::popen p(x, "", oga::kPopenRead);
+        std::string v;
+        oga::raise_on_failure(p.read_stdout(v));
+        oga::raise_on_failure(p.wait());
+        printf("Output: %s", v.c_str());
+    }
+    catch(oga::oga_error const & e) {
+        printf("Failed to start process: %d - %s\n", e.error().code(), e.what());
+    }
+
 }

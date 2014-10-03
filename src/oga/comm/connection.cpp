@@ -18,7 +18,7 @@
 
 #include <oga/comm/connection.hpp>
 
-#if defined(WIN32) || defined(WIN64)
+#if defined(_WIN32)
 #   include <oga/comm/detail/connection_windows.hpp>
 #else
 #   include <oga/comm/detail/connection_linux.hpp>

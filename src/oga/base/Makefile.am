@@ -20,6 +20,10 @@ noinst_LTLIBRARIES = liboga-base.la
 
 liboga_base_la_CXXFLAGS=$(AM_CXXFLAGS) $(OGA_CXX_FLAGS)
 liboga_base_la_SOURCES=\
+	detail/process_posix.cpp \
+	detail/process_windows.cpp \
+	detail/thread_posix.cpp \
+	detail/thread_windows.cpp \
 	errors.cpp \
 	logging.cpp \
 	logging_appender.cpp \
@@ -29,9 +33,13 @@ liboga_base_la_SOURCES=\
 
 
 liboga_base_la_SOURCES+=\
+	detail/process.hpp \
+	detail/thread.hpp \
 	error_def.hpp \
 	errors.hpp \
-	logging_appender.hpp \
 	logging.hpp \
+	logging_appender.hpp \
+	process.hpp \
+	thread.hpp \
 	types.hpp \
 	$(NULL)

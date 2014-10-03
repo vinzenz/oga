@@ -36,8 +36,21 @@ LT_INIT
 
 OGA_CXX_INCLUDES="-I\$(top_srcdir)/src -I\$(top_srcdir)/ext/utf8cpp/source"
 OGA_CXX_FLAGS="-std=c++98 -W -Wall -pedantic \$(OGA_CXX_INCLUDES)"
+OGA_LDFLAGS=""
+
+case $host_os in
+    mingw*)
+        OGA_LDFLAGS+=" -static -static-libgcc -static-libstdc++"
+    ;;
+    *)
+        OGA_CXX_FLAGS+=" -pthread"
+        OGA_LDFLAGS+=" -lpthread"
+    ;;
+esac
+
 AC_SUBST([OGA_CXX_INCLUDES])
 AC_SUBST([OGA_CXX_FLAGS])
+AC_SUBST([OGA_LDFLAGS])
 
 AC_CONFIG_FILES([
     Makefile

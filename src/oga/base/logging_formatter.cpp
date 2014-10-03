@@ -17,9 +17,12 @@
 //
 
 #include <oga/base/logging.hpp>
+#include <oga/base/thread.hpp>
+#include <oga/base/process.hpp>
 #include <oga/util/split.hpp>
 #include <sstream>
 #include <time.h>
+#include <memory.h>
 
 namespace oga {
 namespace log {
@@ -53,6 +56,14 @@ protected:
 };
 
 namespace fmt {
+    template< typename T >
+    error_type streamout(util::string_appender a, T const & t) {
+        std::ostringstream ostr;
+        ostr << t;
+        a(ostr.str());
+        return error_type();
+    }
+
     error_type message(util::string_appender a, log::data const & d) {
         a(d.message);
         return error_type();
@@ -64,10 +75,7 @@ namespace fmt {
     }
 
     error_type line(util::string_appender a, log::data const & d) {
-        std::ostringstream ostr;
-        ostr << d.line;
-        a(ostr.str());
-        return error_type();
+        return streamout(a, d.line);
     }
 
     error_type func(util::string_appender a, log::data const & d) {
@@ -80,10 +88,17 @@ namespace fmt {
         return error_type();
     }
 
-    error_type thread(util::string_appender a, log::data const &) {
-        //TODO: Get thread id
-        a("<THREADNAME NOT IMPLEMENTED>");
+    error_type process(util::string_appender a, log::data const &) {
+        return streamout(a, this_process::id());
+    }
+
+    error_type threadname(util::string_appender a, log::data const &) {
+        a(this_thread::name());
         return error_type();
+    }
+
+    error_type thread(util::string_appender a, log::data const &) {
+        return streamout(a, this_thread::id());
     }
 
     error_type timestamp(util::string_appender a, log::data const &) {
@@ -91,7 +106,11 @@ namespace fmt {
         struct tm * timeinfo = 0;
         time(&rawtime);
         timeinfo = gmtime(&rawtime);
-        a(asctime(timeinfo));
+        char buf[32];
+        memset(buf, 0, sizeof(buf));
+        if(strftime(buf, sizeof(buf) - 1, "%Y-%m-%dT%TZ", timeinfo) != 0) {
+            a(buf);
+        }
         return error_type();
     }
 
@@ -112,12 +131,24 @@ inline error_type parse(std::vector<format_applicator> & result,
                 formatter = pos != std::string::npos;
                 if(formatter) {
                     std::string name = a[i].substr(1, pos - 1);
+                    if(a[i].size() > pos + 1) {
+                        char x = a[i][pos + 1];
+                        if(x == 'd' || x == 's') {
+                            ++pos;
+                        }
+                    }
                     error_type (*fun)(util::string_appender, log::data const &) = 0;
                     if(name == "asctime") {
                         fun = fmt::timestamp;
                     }
                     else if(name == "threadName") {
+                        fun = fmt::threadname;
+                    }
+                    else if(name == "tid") {
                         fun = fmt::thread;
+                    }
+                    else if(name == "pid") {
+                        fun = fmt::process;
                     }
                     else if(name == "file" || name == "module") {
                         fun = fmt::file;
@@ -145,7 +176,7 @@ inline error_type parse(std::vector<format_applicator> & result,
                 }
             }
             if(!formatter) {
-                result.push_back(format_applicator(new string_applicator("%" + a[i])));
+                result.push_back(format_applicator(new string_applicator((i == 0 ? "": "%") + a[i])));
             }
         }
     }

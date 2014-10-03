@@ -19,22 +19,26 @@
 #ifndef GUARD_OGA_COMM_DETAIL_CONNECTION_WINDOWS_HPP_INCLUDED
 #define GUARD_OGA_COMM_DETAIL_CONNECTION_WINDOWS_HPP_INCLUDED
 
-#include <oga/comm/connection.hpp>
+#include <oga/comm/detail/implementation_base.hpp>
+#include <windows.h>
 
 namespace oga {
 namespace comm {
 
-class connection::implementation
+class connection::implementation : public implementation_base
 {
+    HANDLE handle_;
+    OVERLAPPED read_ovl_;
+    OVERLAPPED write_ovl_;
 public:
     implementation();
     virtual ~implementation();
 
     error_type connect(connection_params const & params);
     error_type close();
-
-    error_type receive(message_type & message);
-    error_type send(message_type & message);
+protected:
+    error_type read_buffer(void * buffer, size_t buffer_size, size_t & bytes_read);
+    error_type write_buffer(void const * buffer, size_t buffer_size);
 };
 
 }}

@@ -16,15 +16,12 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
-#if !defined(WIN32) && !defined(WIN64)
+#if !defined(_WIN32)
 
 #include <oga/comm/detail/connection_linux.hpp>
-#include <oga/proto/json/json_generator.hpp>
-#include <oga/proto/json/json_parser.hpp>
 #include <oga/base/errors.hpp>
 #include <oga/base/error_def.hpp>
 
-#include <algorithm>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/socket.h>
@@ -75,12 +72,10 @@ error_type connection::implementation::close() {
     return error_type();
 }
 
-error_type connection::implementation::read_next_buffer() {
-    errno = 0;
-    buffers_.push_back(buffer());
-    buffer & data = buffers_.back();
+error_type connection::implementation::read_buffer(void * buffer, size_t buffer_size, size_t & bytes_read) {
     error_type result;
-    while((data.size = read(handle_, data.data, sizeof(data.data))) == -1) {
+    errno = 0;
+    while((bytes_read = read(handle_, buffer, buffer_size)) == -1) {
         result = get_last_system_error();
         if(result.code() != EINTR) {
             break;
@@ -89,64 +84,15 @@ error_type connection::implementation::read_next_buffer() {
     return result;
 }
 
-error_type connection::implementation::get_line(std::string & line) {
-    bool completed = false;
-    while(!completed) {
-        if(buffers_.empty()) {
-            error_type result = read_next_buffer();
-            if(result.code() != 0) {
-                return result;
-            }
-        }
-        while(!buffers_.empty()) {
-            buffer & b = buffers_.front();
-            char const * start = b.data + b.pos;
-            char const * end = b.data + b.size;
-            char const * p = std::find(start, end, '\n');
-            if(p != end) {
-                line.append(start, p);
-                b.pos = p - b.data;
-                ++b.pos;
-                completed = true;
-            }
-            else {
-                line.append(start, end);
-                buffers_.pop_front();
-            }
-        }
-    }
-    return error_type();
-}
-
-error_type connection::implementation::receive(message_type & message) {
-    error_type result;
-    std::string line;
-    while((result = get_line(line)).code() == 0 && line.empty()) {
-        result = read_next_buffer();
-        if(result.code() != 0) {
-            return result;
-        }
-    }
-    oga::proto::json::value value;
-    if(!parse(line.c_str(), line.c_str() + line.size(), value)) {
-        return app_error(kAppErrInvalidMessage, kESevWarning);
-    }
-    if(value.type() != oga::proto::json::vt_object) {
-        return app_error(kAppErrInvalidMessageFormat, kESevWarning);
-    }
-    message = value.get_object();
-    return result;
-}
-
-error_type connection::implementation::send(message_type & message) {
-    std::string msgstr = oga::proto::json::generate(message) + '\n';
+error_type connection::implementation::write_buffer(void const * buffer, size_t size) {
     errno = 0;
-    int result = ::write(handle_, msgstr.c_str(), int(msgstr.size()));
+    int result = ::write(handle_, buffer, static_cast<int>(size));
     if(result == -1) {
         return get_last_system_error();
     }
     return error_type();
 }
+
 
 }}
 

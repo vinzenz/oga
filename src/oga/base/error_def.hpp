@@ -26,6 +26,8 @@ enum application_errors {
     kAppErrSuccess = 0,
     kAppErrInvalidMessage,
     kAppErrInvalidMessageFormat,
+    kAppErrInvalidParameter,
+    kAppErrInvalidNumberOfArguments,
 
     // This should be always the last one
     kAppErr_COUNT
@@ -34,7 +36,9 @@ enum application_errors {
 static char const * const application_error_messages[kAppErr_COUNT] = {
     "Operation completed successfully",
     "Couldn't parse a message received",
-    "The message received had an invalid format"
+    "The message received had an invalid format",
+    "An invalid paramter has been passed",
+    "An invalid number of arguments have been passed."
 };
 
 

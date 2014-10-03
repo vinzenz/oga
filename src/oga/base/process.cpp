@@ -16,28 +16,13 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
-#ifndef GUARD_OGA_COMM_DETAIL_CONNECTION_LINUX_HPP_INCLUDED
-#define GUARD_OGA_COMM_DETAIL_CONNECTION_LINUX_HPP_INCLUDED
-
-#include <oga/comm/detail/implementation_base.hpp>
+#include <oga/base/process.hpp>
 
 namespace oga {
-namespace comm {
-
-class connection::implementation : public implementation_base
-{
-public:
-    implementation();
-    virtual ~implementation();
-
-    error_type connect(connection_params const & params);
-    error_type close();
-protected:
-    error_type read_buffer(void * buffer, size_t buffer_size, size_t & bytes_read);
-    error_type write_buffer(void const * buffer, size_t buffer_size);
-    int handle_;
-};
-
-}}
-#endif //GUARD_OGA_COMM_DETAIL_CONNECTION_LINUX_HPP_INCLUDED
-
+    process::process(
+            std::string const & cmdline,
+            std::string const & working_directory,
+            popen_flags flags /*= kPopenRead*/)
+    : info_(cmdline, working_directory, flags)
+    {}
+}
