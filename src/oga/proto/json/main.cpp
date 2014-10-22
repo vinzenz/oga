@@ -122,6 +122,8 @@ test_case const cases[] = {
     {"true", parse_boolean, true},
     {"false", parse_boolean, true},
     {"null", parse_null, true},
+    {"{}", parse_object, true},
+    {"[]", parse_array, true},
     {0, 0, false}
 };
 

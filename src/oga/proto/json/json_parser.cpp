@@ -179,18 +179,19 @@ bool parse_object(context & ctx, value & result, token_type usage) {
         }
         if(ok) {
             o[key.get_string()] = val;
-            token_type next = advance(ctx);
-            if(next == tt_object_end) {
-                result.swap(vo);
-                push(ctx, tt_object_end, ctx.current++, usage);
-                break;
-            }
-            if(next != tt_sep) {
-                ok = false;
-                break;
-            }
-            push(ctx, tt_sep, ctx.current++);
         }
+        token_type next = advance(ctx);
+        if(next == tt_object_end) {
+            result.swap(vo);
+            push(ctx, tt_object_end, ctx.current++, usage);
+            ok = true;
+            break;
+        }
+        if(next != tt_sep) {
+            ok = false;
+            break;
+        }
+        push(ctx, tt_sep, ctx.current++);
     }
     return ok;
 }
@@ -205,17 +206,17 @@ bool parse_array(context & ctx, value & result, token_type) {
         ok = parse_value(ctx, entry);
         if(ok) {
             a.push_back(entry);
-            token_type next = advance(ctx);
-            if(next != tt_sep) {
-                ok = next == tt_array_end;
-                if(ok) {
-                    result.swap(va);
-                    push(ctx, tt_array_end, ctx.current++);
-                }
-                break;
-            }
-            push(ctx, tt_sep, ctx.current++);
         }
+        token_type next = advance(ctx);
+        if(next != tt_sep) {
+            ok = next == tt_array_end;
+            if(ok) {
+                result.swap(va);
+                push(ctx, tt_array_end, ctx.current++);
+            }
+            break;
+        }
+        push(ctx, tt_sep, ctx.current++);
     }
     return ok;
 }
