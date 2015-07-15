@@ -44,7 +44,7 @@ connection::implementation::~implementation()
 
 error_type connection::implementation::connect(connection_params const & params) {
     errno = 0;
-    int handle = socket(PF_UNIX, SOCK_STREAM, 0);
+    int handle = socket(PF_UNIX, SOCK_CLOEXEC|SOCK_STREAM, 0);
     if(handle >= 0) {
 
         sockaddr_un address;
@@ -69,13 +69,13 @@ error_type connection::implementation::close() {
     if(h >= 0 && !::close(h)) {
         return get_last_system_error();
     }
-    return error_type();
+    return success();
 }
 
 error_type connection::implementation::read_buffer(void * buffer, size_t buffer_size, size_t & bytes_read) {
     error_type result;
     errno = 0;
-    while((bytes_read = read(handle_, buffer, buffer_size)) == -1) {
+    while((bytes_read = read(handle_, buffer, buffer_size)) == ~size_t(0)) {
         result = get_last_system_error();
         if(result.code() != EINTR) {
             break;
@@ -90,7 +90,7 @@ error_type connection::implementation::write_buffer(void const * buffer, size_t 
     if(result == -1) {
         return get_last_system_error();
     }
-    return error_type();
+    return success();
 }
 
 

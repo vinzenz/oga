@@ -57,10 +57,12 @@ struct context {
     char const * end;
     char const * current;
     std::vector<token> tokens;
+    std::string (*string_filter_hook)(std::string);
 };
 
 
 bool parse(char const * start, char const * end, value & result);
+bool parse_filter(char const * start, char const * end, value & result, std::string (*hook)(std::string));
 token_type advance(context & ctx);
 bool skipws(context & ctx);
 bool parse_value(context & ctx, value & result, token_type usage = tt_invalid);

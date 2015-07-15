@@ -3,3 +3,12 @@ ext/utf8cpp/source/utf8
 src/oga/base
 src/oga/base/detail
 src/oga/comm/detail
+src/oga/proto/json
+src/oga/handlers
+src/oga/util
+src/oga/comm
+src/oga/core
+src/oga/proto/config
+src/oga/core/detail
+src/oga/core/providers
+src/oga/core/providers/detail

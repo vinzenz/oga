@@ -16,9 +16,12 @@ libtool
 *.lo
 *.la
 *.a
+*.exe
 *.sw[po]
 *.Plo
 *.Po
+*.log
+*.user
 ar-lib
 depcomp
 .deps

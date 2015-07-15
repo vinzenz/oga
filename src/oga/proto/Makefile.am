@@ -16,4 +16,4 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-SUBDIRS=json
+SUBDIRS=json config

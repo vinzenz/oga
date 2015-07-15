@@ -69,12 +69,12 @@ namespace this_process {
                 break;
             }
         }
-        return error_type();
+        return success();
     }
 
     error_type popen::write_stdin(std::string const & b) {
         ssize_t total = 0;
-        for(;total < b.size();) {
+        for(;total < ssize_t(b.size());) {
             ssize_t written = ::write(info_.state.conin, b.c_str() + total, b.size() - total);
             if(written == -1) {
                 error_type err = get_last_system_error();
@@ -84,7 +84,7 @@ namespace this_process {
             }
             total += written;
         }
-        return error_type();
+        return success();
     }
 
     error_type popen::wait() {
@@ -92,7 +92,7 @@ namespace this_process {
         if(ret == -1) {
             return get_last_system_error();
         }
-        return error_type();
+        return success();
     }
 
     int popen::exit_code() {
@@ -119,7 +119,7 @@ namespace this_process {
                 return get_last_system_error();
             }
         }
-        return error_type();
+        return success();
     }
 
     inline void close_fd(int * p) {
@@ -141,23 +141,23 @@ namespace this_process {
         }
 
         int conin[2] = {-1, -1}, conout[2] = {-1, -1}, conerr[2] = {-1, -1}, com[2] = {-1, -1};
-        error_type err = error_type();
+        error_type err = success();
 
         err = prep_pipe(com);
-        if(err.code() != 0) {
+        if(err.code() != kAppErrSuccess) {
             return err;
         }
 
         if((info_.flags & kPopenWrite) == kPopenWrite) {
             err = prep_pipe(conin);
         }
-        if(err.code() == 0 && (info_.flags & kPopenRead) == kPopenRead) {
+        if(err.code() == kAppErrSuccess && (info_.flags & kPopenRead) == kPopenRead) {
             err = prep_pipe(conout);
-            if(err.code() == 0) {
+            if(err.code() == kAppErrSuccess) {
                 err = prep_pipe(conerr);
             }
         }
-        if(err.code() != 0) {
+        if(err.code() != kAppErrSuccess) {
             close_all_fds(conin, conout, conerr);
             return err;
         }
@@ -224,7 +224,7 @@ namespace this_process {
                 info_.state.exit_code = 0;
             }
         }
-        return error_type();
+        return success();
     }
 }
 

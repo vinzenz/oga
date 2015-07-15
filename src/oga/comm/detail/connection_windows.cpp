@@ -50,7 +50,7 @@ error_type connection::implementation::connect(connection_params const & params)
     else {
         return get_last_system_error();
     }
-    return error_type();
+    return success();
 }
 
 error_type connection::implementation::close() {
@@ -58,7 +58,7 @@ error_type connection::implementation::close() {
         CloseHandle(handle_);
         handle_ = INVALID_HANDLE_VALUE;
     }
-    return error_type();
+    return success();
 }
 
 error_type connection::implementation::read_buffer(void * buffer, size_t buffer_size, size_t & bytes_read) {
@@ -73,7 +73,7 @@ error_type connection::implementation::read_buffer(void * buffer, size_t buffer_
     else {
         return get_last_system_error();
     }
-    return error_type();
+    return success();
 }
 
 error_type connection::implementation::write_buffer(void const * buffer, size_t buffer_size){
@@ -87,7 +87,7 @@ error_type connection::implementation::write_buffer(void const * buffer, size_t 
     else {
         return get_last_system_error();
     }
-    return error_type();
+    return success();
 }
 
 }}

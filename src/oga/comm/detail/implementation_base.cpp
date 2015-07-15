@@ -32,7 +32,7 @@ error_type implementation_base::read_next_buffer() {
     buffers_.push_back(buffer());
     buffer & data = buffers_.back();
     error_type result = read_buffer(data.data, sizeof(data.data), data.size);
-    if(result.code() != 0) {
+    if(result.code() != kAppErrSuccess) {
         buffers_.pop_back();
     }
     return result;
@@ -43,7 +43,7 @@ error_type implementation_base::get_line(std::string & line) {
     while(!completed) {
         if(buffers_.empty()) {
             error_type result = read_next_buffer();
-            if(result.code() != 0) {
+            if(result.code() != kAppErrSuccess) {
                 return result;
             }
         }
@@ -64,15 +64,15 @@ error_type implementation_base::get_line(std::string & line) {
             }
         }
     }
-    return error_type();
+    return success();
 }
 
 error_type implementation_base::receive(connection::message_type & message) {
     error_type result;
     std::string line;
-    while((result = get_line(line)).code() == 0 && line.empty()) {
+    while((result = get_line(line)).code() == kAppErrSuccess && line.empty()) {
         result = read_next_buffer();
-        if(result.code() != 0) {
+        if(result.code() != kAppErrSuccess) {
             return result;
         }
     }

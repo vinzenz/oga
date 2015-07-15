@@ -19,19 +19,31 @@
 #ifndef GUARD_OGA_UTIL_ENCODING_HPP_INCLUDED
 #define GUARD_OGA_UTIL_ENCODING_HPP_INCLUDED
 
+#include <string>
+#include <oga/base/types.hpp>
+
 namespace oga {
 namespace util {
 
-typedef std::basic_string<uint8_t>  utf8_string;
-typedef std::basic_string<uint16_t> utf16_string;
-typedef std::basic_string<uint32_t> utf32_string;
+typedef char utf8_char_t;
+#if defined(_WIN32)
+typedef wchar_t utf16_char_t;
+#else
+typedef uint16_t utf16_char_t;
+#endif
+typedef uint32_t utf32_char_t;
 
-utf8_string utf16_to_utf8(uint16_t const * start, uint16_t const * end);
-utf8_string utf32_to_utf8(uint32_t const * start, uint32_t const * end);
+typedef std::basic_string<utf8_char_t>  utf8_string;
+typedef std::basic_string<utf16_char_t> utf16_string;
+typedef std::basic_string<utf32_char_t> utf32_string;
 
-utf16_string utf8_to_utf16(uint8_t const * start, uint8_t const * end);
-utf16_string utf8_to_utf32(uint8_t const * start, uint8_t const * end);
+utf8_string utf16_to_utf8(utf16_char_t const * start, utf16_char_t const * end);
+utf8_string utf32_to_utf8(utf32_char_t const * start, utf32_char_t const * end);
 
+utf16_string utf8_to_utf16(utf8_char_t const * start, utf8_char_t const * end);
+utf32_string utf8_to_utf32(utf8_char_t const * start, utf8_char_t const * end);
+
+utf8_string utf16_to_utf8(utf16_char_t c);
 utf8_string utf16_to_utf8(uint16_t c);
 
 }}

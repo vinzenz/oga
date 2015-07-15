@@ -38,6 +38,17 @@ OGA_CXX_INCLUDES="-I\$(top_srcdir)/src -I\$(top_srcdir)/ext/utf8cpp/source"
 OGA_CXX_FLAGS="-std=c++98 -W -Wall -pedantic \$(OGA_CXX_INCLUDES)"
 OGA_LDFLAGS=""
 
+OGA_CXX_FLAGS+=" -DOGA_WITH_APT"
+OGA_CXX_FLAGS+=" -DOGA_WITH_RPM"
+
+OGA_WITH_RPM=1
+OGA_WITH_APT=1
+AM_CONDITIONAL([OGA_WITH_RPM], [test "$OGA_WITH_RPM" = yes])
+AM_CONDITIONAL([OGA_WITH_APT], [test "$OGA_WITH_APT" = yes])
+
+OGA_LDFLAGS+=" -lapt-pkg"
+OGA_LDFLAGS+=" -lrpm"
+
 case $host_os in
     mingw*)
         OGA_LDFLAGS+=" -static -static-libgcc -static-libstdc++"
@@ -58,7 +69,9 @@ AC_CONFIG_FILES([
     src/oga/Makefile
     src/oga/base/Makefile
     src/oga/comm/Makefile
+    src/oga/core/Makefile
     src/oga/proto/Makefile
+    src/oga/proto/config/Makefile
     src/oga/proto/json/Makefile
     src/oga/util/Makefile
 ])

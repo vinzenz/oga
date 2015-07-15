@@ -35,6 +35,7 @@ public:
 protected:
     error_type read_buffer(void * buffer, size_t buffer_size, size_t & bytes_read);
     error_type write_buffer(void const * buffer, size_t buffer_size);
+protected:
     int handle_;
 };
 

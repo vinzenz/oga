@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+#include <inttypes.h>
 using namespace oga::proto::json;
 using std::string;
 
@@ -49,7 +50,7 @@ struct dumper{
     }
 
     void operator()(int64_t i) const {
-        printf("%lli", i);
+        printf("%" PRIi64, i);
     }
 
     void operator()(object const & o) const {
@@ -67,7 +68,7 @@ struct dumper{
         printf("%s", s.c_str());
     }
 
-    void operator()(null const & n) const {
+    void operator()(null const &) const {
         printf("null");
     }
 
@@ -93,7 +94,7 @@ void test(test_case const & tc,  bool is_parse_value) {
     printf("-----------------------------\n");
     printf("Parsed string: `%s`\n", str);
     printf("Using parse_value: %s\n", is_parse_value ? "Yes" : "No");
-    context ctx{str, str + strlen(str), str, {}};
+    context ctx = {str, str + strlen(str), str, std::vector<token>(), 0};
     value result;
     if(fun(ctx, result, tt_invalid) == tc.expected) {
         printf("Result: success\n");

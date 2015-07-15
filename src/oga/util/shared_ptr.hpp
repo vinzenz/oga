@@ -19,23 +19,41 @@
 #ifndef GUARD_OGA_UTIL_SHARED_PTR_HPP_INCLUDED
 #define GUARD_OGA_UTIL_SHARED_PTR_HPP_INCLUDED
 
+#include <oga/base/types.hpp>
+#include <algorithm>
+
 namespace oga {
 namespace util {
+
+template< typename T >
+void deleter(T * p) {
+    delete p;
+}
 
 template< typename T >
 class shared_ptr {
     template<typename U>
     friend class shared_ptr;
 public:
+    template< typename CloserT >
+    explicit shared_ptr(T * t, CloserT closer)
+    : p_(t)
+    , r_(t != 0 ? new size_t(1) : 0)
+    , closer_(reinterpret_cast<void(*)(T*)>(closer))
+    {
+    }
+
     explicit shared_ptr(T * t = 0)
     : p_(t)
     , r_(t != 0 ? new size_t(1) : 0)
+    , closer_(0)
     {
     }
 
     shared_ptr(shared_ptr const & rhs)
     : p_(rhs.p_)
     , r_(rhs.r_)
+    , closer_(rhs.closer_)
     {
         if(r_) ++(*r_);
     }
@@ -44,19 +62,13 @@ public:
     shared_ptr(shared_ptr<U> const & rhs)
     : p_(static_cast<U* const>(rhs.p_))
     , r_(rhs.r_)
+    , closer_(reinterpret_cast<void(*)(T*)>(rhs.closer_))
     {
         if(r_) ++(*r_);
     }
 
     virtual ~shared_ptr() {
-        if(p_ && r_) {
-            if(--(*r_) == 0) {
-                delete p_;
-                delete r_;
-            }
-            r_ = 0;
-            p_ = 0;
-        }
+        unref();
     }
 
     shared_ptr<T> & operator=(shared_ptr<T> rhs) {
@@ -67,6 +79,13 @@ public:
     void swap(shared_ptr<T> & rhs) {
         std::swap(p_, rhs.p_);
         std::swap(r_, rhs.r_);
+        std::swap(closer_, rhs.closer_);
+    }
+
+    template< typename CloserT>
+    void reset(T * ptr, CloserT closer) {
+        shared_ptr<T> tmp(ptr, closer);
+        swap(tmp);
     }
 
     void reset(T * ptr = 0) {
@@ -106,16 +125,53 @@ protected:
     void unref() {
         if(p_ && r_) {
             if(--(*r_) == 0) {
-                delete p_;
+                if(p_) {
+                    if(closer_) closer_(p_);
+                    else deleter(p_);
+                }
                 delete r_;
-                p_ = 0;
+                p_ = 0;                
                 r_ = 0;
+                closer_ = 0;
             }
         }
     }
 protected:
     T* p_;
     size_t* r_;
+    void (*closer_)(T *);
+};
+
+template< typename T >
+struct impl_getter {
+    template< typename U >
+    impl_getter(U * u)
+    : p_(static_cast<T*>(u))
+    {}
+
+    template< typename U >
+    impl_getter(shared_ptr<U> u)
+    : p_(static_cast<T *>(u.ptr()))
+    {}
+
+    T const & operator*() const {
+        return *p_;
+    }
+
+    T & operator*() {
+        return *p_;
+    }
+
+    T * operator->() {
+        return p_;
+    }
+
+    T const * operator->() const {
+        return p_;
+    }
+
+private:
+    T * p_;
 };
 
 }}

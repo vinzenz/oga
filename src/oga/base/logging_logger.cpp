@@ -49,7 +49,9 @@ appender_ptr logger::appender() const {
 }
 
 error_type logger::log(log::data const & d) {
-    return appender_->append(d);
+    if(level() >= d.level)
+        return appender_->append(d);
+    return success();
 }
 
 }}

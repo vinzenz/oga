@@ -51,7 +51,11 @@ repository & repo() {
 
 logger_ptr get(char const * name) {
     if(repo().loggers.count(name) == 0) {
-        return default_logger();
+        if(repo().loggers.count("root")) {
+            repo().loggers[name] = repo().loggers["root"]->derive(name);
+        } else {
+            return default_logger();
+        }
     }
     return repo().loggers[name];
 }
@@ -61,23 +65,25 @@ void configure_appender(oga::proto::json::object const & configuration, std::str
     config cfg = configuration[appender_name].get_object(config());
     formatter_ptr formatter = repo().formatters[cfg["formatter"].get_string("")];
     std::string cls = cfg["class"].get_string("default");
-    if(cls == "rotating_file_appender") {
-        repo().appenders[name].reset(new detail::rotating_file_appender(name, formatter, cfg));
+    if(cls == "rotating_file_appender" || cls == "handlers.RotatingFileHandler") {
+        repo().appenders[name].reset(new detail::rotating_file_appender(name, formatter, detail::convert_from_pycfg(cfg)));
     }
-    else if(cls == "console_appender") {
-        repo().appenders[name].reset(new detail::console_appender(name, formatter, cfg));
+    else if(cls == "console_appender" || cls == "StreamHandler") {
+        repo().appenders[name].reset(new detail::console_appender(name, formatter,  cfg));
     }
     else if(cls == "file_appender") {
-        repo().appenders[name].reset(new detail::file_appender(name, formatter, cfg));
+        repo().appenders[name].reset(new detail::file_appender(name, formatter, detail::convert_from_pycfg(cfg)));
     }
     else if(cls == "null_appender") {
         repo().appenders[name].reset(new detail::null_appender(name, formatter, cfg));
+    }
+    else if(cls == "syslog_appender" || cls == "handlers.SysLogHandler") {
+        repo().appenders[name].reset(new detail::syslog_appender(name, formatter, cfg));
     }
 }
 
 void configure_formatter(oga::proto::json::object const & configuration, std::string const & name) {
     std::string formatter_name = "formatter_" + name;
-    // TODO: Implement formatter configuration
     config cfg = configuration[formatter_name].get_object(config());
     repo().formatters[name].reset(new formatter(name, cfg["format"].get_string("%(message)s")));
 }
@@ -99,7 +105,7 @@ void configure_logger(oga::proto::json::object const & configuration, std::strin
             }
         }
     }
-    repo().loggers[name].reset(new logger(name, kLevelInfo, appender));
+    repo().loggers[name].reset(new logger(name, conv_level(cfg["level"].get_string("INFO")), appender));
 }
 
 void configure_loggers(oga::proto::json::object const & configuration, std::vector<std::string> const & names) {

@@ -86,7 +86,7 @@ namespace {
         }
         CloseHandle(is_input ? wr : rd);
         (is_input ? wr : rd) = tmp;
-        return oga::error_type();
+        return oga::success();
     }
 }
 
@@ -130,7 +130,7 @@ namespace this_process {
                 break;
             }
         }
-        return error_type();
+        return success();
     }
 
     error_type popen::write_stdin(std::string const & b) {
@@ -142,14 +142,14 @@ namespace this_process {
             }
             total += written;
         }
-        return error_type();
+        return success();
     }
 
     error_type popen::wait() {
         if(::WaitForSingleObject(info_.state.pi.hProcess, INFINITE) == WAIT_FAILED) {
             return get_last_system_error();
         }
-        return error_type();
+        return success();
     }
 
     int popen::exit_code() {
@@ -169,11 +169,11 @@ namespace this_process {
             info_.state.si.dwFlags |= STARTF_USESTDHANDLES;
             if(info_.flags & kPopenRead) {
                 error_type err = create_pipe(info_.state.si.hStdOutput, info_.state.conoutput, false);
-                if(err.code() != 0) {
+                if(err.code() != kAppErrSuccess) {
                     return err;
                 }
                 err = create_pipe(info_.state.si.hStdError, info_.state.conerror, false);
-                if(err.code() != 0) {
+                if(err.code() != kAppErrSuccess) {
                     return err;
                 }
             }
@@ -183,7 +183,7 @@ namespace this_process {
             }
             if(info_.flags & kPopenWrite) {
                 error_type err = create_pipe(info_.state.coninput, info_.state.si.hStdInput, true);
-                if(err.code() != 0) {
+                if(err.code() != kAppErrSuccess) {
                     return err;
                 }
             }
@@ -210,7 +210,7 @@ namespace this_process {
             return get_last_system_error();
         }
         printf("Started process with PID %d - %s\n", pid(), cmdline.c_str());
-        return error_type();
+        return success();
     }
 }
 

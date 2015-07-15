@@ -28,6 +28,11 @@ enum application_errors {
     kAppErrInvalidMessageFormat,
     kAppErrInvalidParameter,
     kAppErrInvalidNumberOfArguments,
+    kAppErrInvalidHandle,
+    kAppErrNotImplemented,
+    kAppErrRequestedDataNotProvided,
+    kAppErrNoChanges,
+    kAppErrUnexpectedType,
 
     // This should be always the last one
     kAppErr_COUNT
@@ -38,7 +43,12 @@ static char const * const application_error_messages[kAppErr_COUNT] = {
     "Couldn't parse a message received",
     "The message received had an invalid format",
     "An invalid paramter has been passed",
-    "An invalid number of arguments have been passed."
+    "An invalid number of arguments have been passed.",
+    "An invalid handle has been used.",
+    "The function used has not been implemented.",
+    "The data provider does not provide the requested data.",
+    "Data has not been changed",
+    "An unexpected data type has been encountered."
 };
 
 

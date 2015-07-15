@@ -43,11 +43,14 @@ protected:
 
     error_type get_line(std::string & line);
 
+protected:
     struct buffer {
         char    data[4096];
         size_t  size;
         size_t  pos;
     };
+
+protected:
 
     int handle_;
     std::deque<buffer> buffers_;

@@ -40,6 +40,12 @@ namespace this_thread {
         pthread_getname_np(pthread_self(), buffer, sizeof(buffer));
         return buffer;
     }
+
+    void name(char const * n) {
+        if(n) {
+            pthread_setname_np(pthread_self(), n);
+        }
+    }
 }}
 
 #endif

@@ -75,8 +75,6 @@ namespace json {
 
 
     class value {
-    protected:
-        util::shared_ptr<any_value_base> holder_;
     public:
         value(null = null());
         value(std::string const & s);
@@ -131,7 +129,26 @@ namespace json {
 
         object const & get_object() const;
         object & get_object();
+
+    protected:
+        util::shared_ptr<any_value_base> holder_;
     };
+
+    template< typename > struct tag;
+    template<> struct tag<double> { typedef double type; };
+    template<> struct tag<float> { typedef double type; };
+    template<> struct tag<bool> { typedef bool type; };
+
+    template< typename T >
+    inline value to_value(T const & v, typename tag<T>::type* = 0) {
+        return value(typename tag<T>::type(v));
+    }
+    inline value to_value(int64_t i) {
+        return value(i);
+    }
+    inline value to_value(std::string const & i) {
+        return value(i);
+    }
 
 
     inline bool is_object(value const & v) {
@@ -164,7 +181,16 @@ namespace json {
 
     struct array : std::vector<value>
     {
-        // using vector::vector;
+        typedef std::vector<value> base_type;
+
+        array()
+        : base_type()
+        {}
+
+        template< typename ForwardIterator >
+        array(ForwardIterator begin, ForwardIterator end)
+        : base_type(begin, end)
+        {}
     };
 
     struct object : std::map<std::string, value>

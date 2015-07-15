@@ -20,9 +20,22 @@
 #include <oga/base/thread.hpp>
 #include <oga/base/process.hpp>
 #include <oga/util/split.hpp>
+#include <oga/util/strip.hpp>
 #include <sstream>
 #include <time.h>
 #include <memory.h>
+#include <oga/proto/json/json_generator.hpp>
+#if !defined(_MSC_VER)
+#   include <inttypes.h>
+#else // defined(_MSC_VER)
+#   if !defined(PRIi64)
+#       define PRIi64 "I64d"
+#   endif
+#endif
+
+#if !defined(PRIi64)
+#   error PRIi64 not defined
+#endif
 
 namespace oga {
 namespace log {
@@ -49,29 +62,60 @@ public:
 
     error_type apply(util::string_appender a, log::data const &) const {
         a(s_);
-        return error_type();
+        return success();
     }
 protected:
     std::string s_;
 };
 
 namespace fmt {
+    std::string const & format_index_str(size_t n) {
+        static char const * tmp[] = {
+            "{0}", "{1}",  "{2}",  "{3}",  "{4}",  "{5}",  "{6}",  "{7}",
+            "{8}", "{9}", "{10}", "{11}", "{12}", "{13}", "{14}", "{15}"};
+        static std::vector<std::string> cache(tmp, tmp + (sizeof(tmp)/ sizeof(tmp[0])));
+        while(n >= cache.size()) {
+            char buf[0x100] = {};
+            std::snprintf(buf, sizeof(buf), "{%" PRIi64 "}", (cache.size()));
+            cache.push_back(buf);
+        }
+        return cache[n];
+    }
+
+    std::string format(std::string f, oga::proto::json::array const & v) {
+        using oga::util::strip_copy;
+        for(size_t i = 0; i < v.size(); ++i) {
+            std::string const & idx_str = format_index_str(i);
+            size_t idx = f.find(idx_str);
+            if(idx != std::string::npos) {
+                f.replace(idx, idx_str.size(), strip_copy(oga::proto::json::generate(v[i]), std::string("\"")));
+                // Since we found it, lets continue to find it until we have found all instances
+                --i;
+            }
+        }
+        return f;
+    }
+
     template< typename T >
     error_type streamout(util::string_appender a, T const & t) {
         std::ostringstream ostr;
         ostr << t;
         a(ostr.str());
-        return error_type();
+        return success();
     }
 
     error_type message(util::string_appender a, log::data const & d) {
-        a(d.message);
-        return error_type();
+        if(d.values.empty()) {
+            a(d.message);
+        } else {
+            a(format(d.message, d.values));
+        }
+        return success();
     }
 
     error_type level(util::string_appender a, log::data const & d) {
         a(levelname(d.level));
-        return error_type();
+        return success();
     }
 
     error_type line(util::string_appender a, log::data const & d) {
@@ -80,12 +124,12 @@ namespace fmt {
 
     error_type func(util::string_appender a, log::data const & d) {
         a(d.func ? d.func : "");
-        return error_type();
+        return success();
     }
 
     error_type file(util::string_appender a, log::data const & d) {
         a(d.file ? d.file : "");
-        return error_type();
+        return success();
     }
 
     error_type process(util::string_appender a, log::data const &) {
@@ -94,7 +138,7 @@ namespace fmt {
 
     error_type threadname(util::string_appender a, log::data const &) {
         a(this_thread::name());
-        return error_type();
+        return success();
     }
 
     error_type thread(util::string_appender a, log::data const &) {
@@ -111,12 +155,12 @@ namespace fmt {
         if(strftime(buf, sizeof(buf) - 1, "%Y-%m-%dT%TZ", timeinfo) != 0) {
             a(buf);
         }
-        return error_type();
+        return success();
     }
 
     error_type loggername(util::string_appender a, log::data const & d) {
         a(d.logger_name);
-        return error_type();
+        return success();
     }
 }
 
@@ -181,7 +225,7 @@ inline error_type parse(std::vector<format_applicator> & result,
         }
     }
 
-    return error_type();
+    return success();
 }
 
 
@@ -190,7 +234,7 @@ formatter::formatter(std::string const & name, std::string const & format)
 : name_(name)
 , format_()
 {
-    if(parse(applicators_, format).code() != 0) {
+    if(parse(applicators_, format).code() != kAppErrSuccess) {
         applicators_.push_back(format_applicator(new function_applicator(fmt::message)));
     }
 }
@@ -206,18 +250,18 @@ error_type formatter::apply(std::string & result, log::data const & d) const {
     std::string final;
     for(size_t i = 0; i < applicators_.size(); ++i) {
         error_type err = applicators_[i]->apply(util::string_appender(final), d);
-        if(err.code() != 0) {
+        if(err.code() != kAppErrSuccess) {
             return err;
         }
     }
     result.swap(final);
-    return error_type();
+    return success();
 }
 
 error_type formatter::set(std::string const & format_spec) {
     std::vector<format_applicator> applicators;
     error_type err = parse(applicators, format_spec);
-    if(err.code() == 0) {
+    if(err.code() == kAppErrSuccess) {
         format_ = format_spec;
         applicators.swap(applicators_);
     }

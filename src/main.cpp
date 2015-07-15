@@ -19,9 +19,16 @@
 #include <oga/comm/connection.hpp>
 #include <oga/proto/json/json_generator.hpp>
 #include <oga/proto/json/json_parser.hpp>
+#include <oga/proto/config/config_parser.hpp>
 #include <oga/base/logging.hpp>
+#include <oga/base/logging_appender.hpp>
 #include <stdio.h>
 #include <oga/base/process.hpp>
+#include <fstream>
+#include <utf8/checked.h>
+#include <algorithm>
+#include <oga/core/agent.hpp>
+#include <oga/core/providers/detail/applications_linux_rpm.hpp>
 
 static char const json_def[] = "{"
     "\"loggers\": {\"keys\": \"root\" },"
@@ -32,7 +39,66 @@ static char const json_def[] = "{"
     "\"formatter_long\": {\"format\": \"[%(name)s]!%(levelname)s TID:%(tid)d PID:%(pid)d TS:%(asctime)s @%(module)s:%(lineno)d MSG:%(message)s\"}"
 "}";
 
+std::string filter(std::string inp) {
+    std::vector<uint32_t> runes;
+    utf8::utf8to32(inp.begin(), inp.end(), std::back_inserter(inp));
+    for(size_t i = 0; i < runes.size(); ++i) {
+        uint32_t & r = runes[i];
+        if(r > utf8::internal::CODE_POINT_MAX
+           || (r > 0xA && r < 0xD)
+           || (r > 0xD && r < 0x20)
+           || (r > 0x7E && r < 0x85)
+           || (r > 0x85 && r < 0xA0)
+           || r == 0xFFFE
+           || r == 0xFFFF
+           || !(utf8::internal::is_code_point_valid(r))) {
+           r = 0xFFFD;
+        }
+    }
+    inp.clear();
+    utf8::utf32to8(runes.begin(), runes.end(), std::back_inserter(inp));
+    return inp;
+}
+
 int main() {
+    oga::core::agent agent;
+
+    OGA_LOG_DEBUG(oga::log::get("root"), "Hello World! {0} {1} {0} {1} '{2}' {3} {4} {5}") % "Some" % 3 % "arguments";
+    OGA_LOG_INFO(oga::log::get("root"), "Hello World! {0} {1} '{2}' {3} {4} {5}") % "Some" % 3 % "arguments";
+    OGA_LOG_ERROR(oga::log::get("root"), "Hello World! {0} {1} {0} {1} '{2}' {3} {4} {5}") % "Some" % 3 % "arguments";
+    oga::core::providers::detail::applications_linux_rpm apt(oga::log::get("root"));
+    apt.configure(agent.config());
+    std::set<std::string> result;
+    oga::error_type err = apt.refresh(result);
+    if(err.code() == 0) {
+        printf("%u results\n", result.size());
+    }
+#if 0
+    using namespace oga::proto::config;
+    object cfg;
+    oga::error_type result = parse("/home/vfeenstr/devel/work/ovirt/ovirt-guest-agent/configurations/default-logger.conf", cfg);
+    if(result.code() == 0) {
+        // cfg["handler_logfile"] = oga::log::detail::convert_from_pycfg(cfg["handler_logfile"].get_object());
+        oga::log::configure(cfg);
+        // printf("Generated: `%s`\n", generate(cfg).c_str());
+    }
+#endif
+
+#if 0
+    using namespace oga::proto::json;
+    std::ifstream ifs("agentcapture-wxp.log");
+    std::string line;
+    while(std::getline(ifs, line)) {
+        value res;
+        if(parse_filter(line.data(), line.data() + line.size(), res, filter)) {
+//            printf("%s\n", generate(res).c_str());
+         // printf("Success\n");
+        }
+        else {
+            printf("Failure\n");
+        }
+    }
+#endif
 #if 0
     using namespace oga::comm;
     oga::proto::json::value config;
@@ -46,11 +112,11 @@ int main() {
     params.address = "/tmp/test";
     connection con;
     oga::error_type err = con.connect(params);
-    if(err.code() == 0) {
+    if(err.code() == kAppErrSuccess) {
         connection::message_type msg;
         err = con.receive(msg);
         printf("Receive result: %d - %s\n", err.code(), err.message().c_str());
-        if(err.code() == 0) {
+        if(err.code() == kAppErrSuccess) {
             printf("Message: %s\n", generate(msg).c_str());
             printf("Name: %s - Address: %s\n", msg["name"].get_string().c_str(), msg["address"].get_string().c_str());
             con.send(msg);
@@ -60,6 +126,7 @@ int main() {
         printf("Connect result: %d - %s\n", err.code(), err.message().c_str());
     }
 #endif
+#if 0
 #if defined(WIN32)
     char const * args[] = {"C:\\windows\\system32\\cmd.exe", "/C", "echo foobar"};
 #else
@@ -88,5 +155,5 @@ int main() {
     catch(oga::oga_error const & e) {
         printf("Failed to start process: %d - %s\n", e.error().code(), e.what());
     }
-
+#endif
 }

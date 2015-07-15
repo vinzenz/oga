@@ -21,6 +21,7 @@
 
 #include <string>
 #include <oga/base/types.hpp>
+#include <oga/base/error_def.hpp>
 #include <stdexcept>
 
 namespace oga {
@@ -65,6 +66,8 @@ error_type get_last_system_error();
 error_type app_error(int32_t code, error_severity sev = kESevError);
 error_type sys_error(int32_t code, error_severity sev = kESevError);
 
+error_type success();
+
 class oga_error : public std::runtime_error {
     error_type error_;
 public:
@@ -80,6 +83,9 @@ public:
 
 void raise_oga_error(error_type const & e);
 void raise_on_failure(error_type const & e);
+
+#define OGA_SUCCEEDED(x) ((x) >= 0)
+#define OGA_FAILED(x)    ((x) < 0)
 
 }
 

@@ -56,6 +56,16 @@ bool parse(char const * start, char const * end, value & result) {
     ctx.start = start;
     ctx.end = end;
     ctx.current = start;
+    ctx.string_filter_hook = 0;
+    return parse_value(ctx, result);
+}
+
+bool parse_filter(char const * start, char const * end, value & result, std::string (*hook)(std::string)) {
+    context ctx;
+    ctx.start = start;
+    ctx.end = end;
+    ctx.current = start;
+    ctx.string_filter_hook = hook;
     return parse_value(ctx, result);
 }
 
@@ -393,6 +403,9 @@ bool parse_string(context & ctx, value & result, token_type usage) {
     bool ok = false;
     if(ch == '"') {
         ++start;
+        if(ctx.string_filter_hook) {
+            ctx.string_filter_hook(target);
+        }
         result = target;
         push(ctx, tt_string, start, usage);
         ctx.current++;

@@ -91,6 +91,10 @@ error_type sys_error(int32_t code, error_severity sev /*= kESevError*/) {
     return error_type(sys_error_category(), code, sev);
 }
 
+error_type success() {
+    return error_type();
+}
+
 error_type::error_type()
 : category_(&sys_error_category())
 , code_(0)
@@ -129,7 +133,7 @@ void raise_oga_error(error_type const & e) {
 }
 
 void raise_on_failure(error_type const & e) {
-    if(e.code() != 0) {
+    if(e.code() != kAppErrSuccess) {
         raise_oga_error(e);
     }
 }

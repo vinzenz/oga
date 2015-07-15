@@ -18,7 +18,19 @@
 
 #include <oga/proto/json/json_generator.hpp>
 #include <utf8/checked.h>
-#include <stdio.h>
+#include <cstdio>
+
+#if !defined(_MSC_VER)
+#   include <inttypes.h>
+#else // defined(_MSC_VER)
+#   if !defined(PRIi64)
+#       define PRIi64 "I64d"
+#   endif
+#endif
+
+#if !defined(PRIi64)
+#   error PRIi64 not defined
+#endif
 
 namespace oga {
 namespace proto {
@@ -32,7 +44,7 @@ namespace {
 
         void operator()(int64_t v) const {
             char buf[0x100] = {};
-            snprintf(buf, sizeof(buf), "%lli", v);
+            std::snprintf(buf, sizeof(buf), "%" PRIi64, v);
             result->append(buf);
         }
 

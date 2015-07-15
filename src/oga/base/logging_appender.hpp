@@ -20,8 +20,14 @@
 #define GUARD_OGA_BASE_LOGGING_APPENDER_HPP_INCLUDED
 
 #include <oga/base/logging.hpp>
+#include <oga/util/strip.hpp>
+#include <oga/util/split.hpp>
 #include <sstream>
-#include <stdio.h>
+#include <cstdio>
+#include <cstdlib>
+#if !defined(_WIN32)
+#   include <syslog.h>
+#endif
 
 namespace oga {
 namespace log {
@@ -35,8 +41,31 @@ public:
     {}
 
     virtual error_type write(std::string const &) {
-        return error_type();
+        return success();
     }
+};
+
+class syslog_appender : public appender {
+public:
+    syslog_appender(std::string const & name, formatter_ptr formatter, config const &)
+    : appender(name, formatter)
+    {
+#if !defined(_WIN32)
+        openlog("", LOG_PID, LOG_USER);
+#endif
+    }
+
+    ~syslog_appender() {
+    }
+
+    virtual error_type write(std::string const & s) {
+#if !defined(_WIN32)
+        syslog(LOG_INFO, "%s", s.c_str());
+#endif
+        return success();
+    }
+protected:
+
 };
 
 class console_appender : public appender {
@@ -44,62 +73,99 @@ public:
     console_appender(std::string const & name, formatter_ptr formatter, config const &)
     : appender(name, formatter)
     {}
+    virtual appender_ptr clone() const {
+        return appender_ptr(new console_appender(name(), formatter_, config()));
+    }
 
 protected:
     virtual error_type write(std::string const & message) {
         printf("%s\n", message.c_str());
-        return error_type();
+        return success();
     }
 };
 
+inline config convert_from_pycfg(config cfg) {
+    using oga::util::strip;
+    using oga::util::strip_copy;
+    using oga::util::split;
+    if(cfg.count("args")) {
+        if(is_string(cfg["args"])) {
+            std::vector<std::string> parts = split(strip(strip(strip(cfg["args"].get_string()), std::string("()"))), ',');
+            if(parts.size() > 0)
+                cfg["path"] = strip(parts[0], std::string(" '\""));
+            if(parts.size() > 1)
+                cfg["mode"] = strip(parts[1], std::string(" '\""));
+            if(parts.size() > 2)
+                cfg["size"] = int64_t(std::atoi(strip_copy(parts[2]).c_str()));
+            if(parts.size() > 3)
+                cfg["count"] = int64_t(std::atoi(strip_copy(parts[3]).c_str()));
+            cfg.erase("args");
+        }
+    }
+    return cfg;
+}
+
 class file_appender : public appender {
-    FILE * handle_;
 public:
     file_appender(std::string const & name, formatter_ptr formatter, config const & cfg)
     : appender(name, formatter)
-    , handle_(0)
+    , handle_()
     {
         std::string const & filepath = cfg["path"].get_string();
-        std::string const & openmode = cfg["mode"].get_string();
-        handle_ = ::fopen(filepath.c_str(), openmode.c_str());
+        std::string openmode = cfg["mode"].get_string();
+        // Special handling for not letting children inherit handles
+#if defined(_MSC_VER)
+        char cloexec_flag = 'N';
+#else
+        char cloexec_flag = 'e';
+#endif
+        if(openmode.find_first_not_of(cloexec_flag) == std::string::npos) {
+            openmode += cloexec_flag;
+        }
+        handle_.reset(::fopen(filepath.c_str(), openmode.c_str()), ::fclose);
     }
 
     int64_t size() const {
-        return ftell(handle_);
+        if(!handle_) return int64_t(0);
+        FILE * f = const_cast<FILE*>(handle_.ptr());
+        fseek(f, 0, SEEK_END);
+        return ftell(f);
     }
 
     ~file_appender(){
-        if(handle_) {
-            ::fclose(handle_);
-        }
     }
 
     virtual error_type write(std::string const &  message) {
-        fwrite(message.c_str(), int(message.size()), 1, handle_);
-        fputc('\n', handle_);
-        return error_type();
+        if(!handle_) return app_error(kAppErrInvalidHandle);
+        fwrite(message.c_str(), int(message.size()), 1, handle_.ptr());
+        fputc('\n', handle_.ptr());
+        return success();
     }
+
+protected:
+    oga::util::shared_ptr<FILE> handle_;
 };
 
+
+
 class rotating_file_appender : public appender {
-    util::shared_ptr<file_appender> internal_;
-    config config_;
-    int64_t max_files_;
-    int64_t max_size_;
 public:
     rotating_file_appender(std::string const & name, formatter_ptr formatter, config const & cfg)
     : appender(name, formatter)
-    , internal_(new file_appender(name, formatter_ptr(), cfg))
     , config_(cfg)
+    , internal_(new file_appender(name, formatter_ptr(), config_))
     {
         max_files_ = config_["count"].get_integer(5);
         max_size_ = config_["size"].get_integer(1 * kMiB);
     }
 
     virtual error_type write(std::string const & message) {
-        if(internal_->size() + int64_t(message.size()) > max_size_) {
+        int64_t size_cur = internal_->size();
+        int64_t size_msg = int64_t(message.size());
+        int64_t new_size = size_cur + size_msg;
+        if(new_size > max_size_) {
             error_type err = roll();
-            if(err.code() != 0) {
+            if(err.code() != kAppErrSuccess) {
                 return err;
             }
         }
@@ -109,20 +175,29 @@ public:
     error_type roll() {
         std::string path = config_["path"].get_string();
         std::ostringstream ostr;
-        ostr <<  path << "." << max_files_;
+        ostr <<  path << "." << max_files_ - 1;
 
         internal_.reset();
         ::remove(ostr.str().c_str());
-        for(int64_t i = max_files_ - 1; i > 0; ++i) {
+        for(int64_t i = max_files_ - 2; i > -1; --i) {
             std::ostringstream old_name;
-            old_name << path << "." << i;
+            old_name << path;
+            if(i != 0) {
+                old_name << "." << i;
+            }
             std::ostringstream new_name;
             new_name << path << "." << i + 1;
             ::rename(old_name.str().c_str(), new_name.str().c_str());
         }
         internal_.reset(new file_appender(name(), formatter_ptr(), config_));
-        return error_type();
+        return success();
     }
+
+protected:
+    config config_;
+    util::shared_ptr<file_appender> internal_;
+    int64_t max_files_;
+    int64_t max_size_;
 };
 
 }}}
