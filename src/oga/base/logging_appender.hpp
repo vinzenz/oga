@@ -61,6 +61,8 @@ public:
     virtual error_type write(std::string const & s) {
 #if !defined(_WIN32)
         syslog(LOG_INFO, "%s", s.c_str());
+#else
+    (void)s;
 #endif
         return success();
     }

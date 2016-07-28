@@ -190,3 +190,5 @@ src/oga/core/logic.hpp
 src/oga/core/providers/detail/applications.hpp
 src/oga/core/providers/detail/applications_linux.hpp
 src/oga/util/encoding.cpp
+src/oga/util/wmiclient.cpp
+src/oga/util/wmiclient.hpp

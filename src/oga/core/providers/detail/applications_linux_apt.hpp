@@ -21,6 +21,8 @@
 
 #include <oga/core/providers/detail/applications_linux.hpp>
 
+#if !defined(_WIN32)
+
 namespace oga {
 namespace core {
 namespace providers {
@@ -34,5 +36,7 @@ public:
 };
 
 }}}}
+
+#endif
 
 #endif //GUARD_OGA_CORE_PROVIDERS_DETAIL_APPLICATIONS_LINUX_APT_HPP_INCLUDED

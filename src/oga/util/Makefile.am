@@ -15,21 +15,26 @@
 #
 # Refer to the README and COPYING files for full details of the license.
 #
+SUBDIRS=type_traits
 
 noinst_LTLIBRARIES = liboga-util.la
 
 liboga_util_la_CXXFLAGS=$(AM_CXXFLAGS) $(OGA_CXX_FLAGS)
+liboga_util_la_LDFLAGS=$(AM_LDFLAGS) $(OGA_LDFLAGS)
 liboga_util_la_SOURCES=\
 	encoding.cpp \
 	registry.cpp \
+	wmiclient.cpp \
 	$(NULL)
 
 
 liboga_util_la_SOURCES+=\
+	enable_if.hpp \
 	encoding.hpp \
 	registry.hpp \
 	shared_ptr.hpp \
 	split.hpp \
 	string_appender.hpp \
 	strip.hpp \
+	wmiclient.hpp \
 	$(NULL)

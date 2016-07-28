@@ -73,7 +73,6 @@ error_category const & app_error_category() {
     return cat;
 }
 
-
 error_type get_last_system_error() {
 #if defined(WIN32) || defined(WIN64)
     return sys_error(int32_t(GetLastError()), kESevError);
@@ -89,6 +88,17 @@ error_type app_error(int32_t code, error_severity sev /*= kESevError*/) {
 
 error_type sys_error(int32_t code, error_severity sev /*= kESevError*/) {
     return error_type(sys_error_category(), code, sev);
+}
+
+error_type com_error(int32_t code) {
+    return error_type(system_error_category(),
+                      code & 0x0000FFFF,
+                      code < 0
+                        ? kESevError
+                        : code != 0
+                            ? kESevInformation
+                            : kESevSuccess);
+
 }
 
 error_type success() {

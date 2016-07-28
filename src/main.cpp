@@ -28,7 +28,11 @@
 #include <utf8/checked.h>
 #include <algorithm>
 #include <oga/core/agent.hpp>
+#include <oga/core/providers/detail/applications_linux_apt.hpp>
 #include <oga/core/providers/detail/applications_linux_rpm.hpp>
+#include <oga/core/providers/detail/applications_windows.hpp>
+#include <oga/util/registry.hpp>
+#include <oga/util/wmiclient.hpp>
 
 static char const json_def[] = "{"
     "\"loggers\": {\"keys\": \"root\" },"
@@ -60,20 +64,64 @@ std::string filter(std::string inp) {
     return inp;
 }
 
-int main() {
+#if defined(_WIN32)
+class printing_registry_enum_handler : public oga::util::registry_enum_handler {
+public:
+    bool operator()(oga::util::registry_handle const &,
+                    std::string const & name,
+                    oga::util::registry_value_type) {
+        printf("Enum: %s\n", name.c_str());
+        return true;
+    }
+};
+#endif
+int main(int argc, char const **argv) {
     oga::core::agent agent;
 
     OGA_LOG_DEBUG(oga::log::get("root"), "Hello World! {0} {1} {0} {1} '{2}' {3} {4} {5}") % "Some" % 3 % "arguments";
     OGA_LOG_INFO(oga::log::get("root"), "Hello World! {0} {1} '{2}' {3} {4} {5}") % "Some" % 3 % "arguments";
     OGA_LOG_ERROR(oga::log::get("root"), "Hello World! {0} {1} {0} {1} '{2}' {3} {4} {5}") % "Some" % 3 % "arguments";
-    oga::core::providers::detail::applications_linux_rpm apt(oga::log::get("root"));
-    apt.configure(agent.config());
-    std::set<std::string> result;
-    oga::error_type err = apt.refresh(result);
-    if(err.code() == 0) {
-        printf("%u results\n", result.size());
+#if defined(_WIN32)
+    oga::core::providers::detail::applications_windows apt(oga::log::get("root"));
+#else
+    oga::core::providers::detail::applications_linux_apt apt(oga::log::get("root"));
+#endif
+#if defined(_WIN32)
+    oga::util::registry_handle reg;
+    oga::error_type reg_result = reg.open(oga::util::kRegRootLocalMachine, "System\\CurrentControlSet\\Services\\TermService");
+    printing_registry_enum_handler reg_enum_printer;
+    if(reg_result.code() == 0) {
+        printf("Opening registry succeeded\nEnumerating value names:\n");
+        reg.enum_values(reg_enum_printer);
+        std::string value;
+        reg_result = reg.get_string_value("ImagePath", value);
+        printf("Getting string value result: %d - '%s' size: %u\n", reg_result.code(), value.c_str(), uint32_t(value.size()));
     }
-#if 0
+    reg.open(oga::util::kRegRootLocalMachine, "System\\CurrentControlSet\\Services");
+    printf("Enumerating services:\n");
+    reg.enum_keys(reg_enum_printer);
+#endif
+
+    apt.configure(agent.config());
+    std::set<std::string> apps_result;
+    oga::error_type err = apt.refresh(apps_result);
+    if(err.code() == 0) {
+        printf("%u results\n", uint32_t(apps_result.size()));
+    }
+#if defined(_WIN32)
+    oga::util::wmi_client wmi(oga::log::get("WMI"));
+    printf("Pre-Connect\n");
+    oga::error_type wmi_err = wmi.connect();
+    if(wmi_err.code() == 0) {
+        printf("Connected!\n");
+        std::vector<std::string> fields;
+        oga::proto::json::array wmi_result;
+        wmi.query(wmi_result, oga::util::split(std::string(argv[1]), '|'), argv[2]);
+    } else {
+        OGA_LOG_ERROR(oga::log::get("root"), "Failed to connect to WMI provider: {0}") % wmi_err.code();
+    }
+#endif
+
     using namespace oga::proto::config;
     object cfg;
     oga::error_type result = parse("/home/vfeenstr/devel/work/ovirt/ovirt-guest-agent/configurations/default-logger.conf", cfg);
@@ -82,7 +130,6 @@ int main() {
         oga::log::configure(cfg);
         // printf("Generated: `%s`\n", generate(cfg).c_str());
     }
-#endif
 
 #if 0
     using namespace oga::proto::json;

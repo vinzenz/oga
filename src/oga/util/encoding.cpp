@@ -16,7 +16,9 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
+#include <oga/util/enable_if.hpp>
 #include <oga/util/encoding.hpp>
+#include <oga/util/type_traits/is_same.hpp>
 #include <utf8/checked.h>
 #include <algorithm>
 
@@ -69,7 +71,11 @@ utf8_string utf16_to_utf8(utf16_char_t c)
     return utf16_to_utf8(buf, buf + 2);
 }
 
-utf8_string utf16_to_utf8(uint16_t c)
+template< typename UInt16>
+typename oga::util::enable_if<
+    !oga::util::type_traits::is_same<UInt16, utf16_char_t>::value,
+    utf8_string
+>::type utf16_to_utf8(UInt16 c)
 {
     utf16_char_t buf[] = {static_cast<utf16_char_t>(c), 0};
     return utf16_to_utf8(buf, buf + 2);

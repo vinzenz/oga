@@ -16,3 +16,21 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
+#include <oga/core/providers/detail/applications.hpp>
+
+#if defined(_WIN32)
+namespace oga {
+namespace core {
+namespace providers {
+namespace detail {
+
+class applications_windows : public applications {
+public:
+    applications_windows(oga::log::logger_ptr logger);
+    bool source_modified() const;
+    virtual oga::error_type refresh(std::set<std::string> & apps);
+    virtual oga::error_type configure(oga::proto::config::object const & cfg);
+};
+
+}}}}
+#endif

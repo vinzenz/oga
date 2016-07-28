@@ -19,8 +19,9 @@
 #define GUARD_OGA_CORE_PROVIDERS_DETAIL_APPLICATIONS_LINUX_HPP_INCLUDED
 
 #include <oga/core/providers/detail/applications.hpp>
-#include <oga/base/logging.hpp>
 #include <oga/util/split.hpp>
+
+#if !defined(_WIN32)
 
 namespace oga {
 namespace core {
@@ -30,14 +31,9 @@ namespace detail {
 class applications_linux : public applications {
 public:
     applications_linux(oga::log::logger_ptr logger)
-    : logger_(logger)
-    , impl_()
+    : applications(logger)
     , apps_()
     {}
-
-    virtual bool is_available() const {
-        return impl_.ptr() != 0;
-    }
 
     virtual oga::error_type configure(oga::proto::config::object const & cfg) {
         if(cfg.is_object("general")) {
@@ -49,14 +45,12 @@ public:
         return success();
     }
 
-public:
-    struct impl { virtual ~impl(){} };
 protected:
-    oga::log::logger_ptr logger_;
-    oga::util::shared_ptr<impl> impl_;
     std::vector<std::string> apps_;
 };
 
 }}}}
+
+#endif
 
 #endif //GUARD_OGA_CORE_PROVIDERS_DETAIL_APPLICATIONS_LINUX_HPP_INCLUDED

@@ -146,6 +146,7 @@ namespace log {
         std::vector<format_applicator> applicators_;
     };
     typedef oga::util::shared_ptr<formatter> formatter_ptr;
+    formatter_ptr default_formatter();
 
     class appender {
     public:

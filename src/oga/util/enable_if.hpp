@@ -16,37 +16,26 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
-
-#include <oga/core/providers/detail/applications_windows.hpp>
-
-#if defined(_WIN32)
+#ifndef GUARD_OGA_UTIL_ENABLE_IF_HPP_INCLUDED
+#define GUARD_OGA_UTIL_ENABLE_IF_HPP_INCLUDED
 
 namespace oga {
-namespace core {
-namespace providers {
-namespace detail {
+namespace util {
 
-applications_windows::applications_windows(oga::log::logger_ptr logger)
-: applications(logger)
-{
-}
+template<
+    bool B,
+    typename T = void
+>
+struct enable_if {
+};
 
-bool applications_windows::source_modified() const
-{
-    return true;
-}
+template<
+    typename T
+>
+struct enable_if<true, T> {
+    typedef T type;
+};
 
-oga::error_type applications_windows::refresh(std::set<std::string> & /*apps*/)
-{
-    return success();
-}
+}}
 
-oga::error_type applications_windows::configure(oga::proto::config::object const & /*cfg*/)
-{
-    return success();
-}
-
-
-}}}}
-
-#endif
+#endif // GUARD_OGA_UTIL_ENABLE_IF_HPP_INCLUDED

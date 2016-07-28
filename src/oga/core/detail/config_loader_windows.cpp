@@ -16,3 +16,36 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
+#if defined(_WIN32)
+
+#include <oga/proto/config/config_parser.hpp>
+#include <oga/core/detail/config_loader.hpp>
+
+namespace oga {
+namespace core {
+namespace detail {
+
+#ifndef OGA_CONFIG_FILE_NAME
+#   define OGA_CONFIG_FILE_NAME "ovirt-guest-agent.ini"
+#endif
+#ifndef OGA_DEFAULT_CONFIG_FILE_NAME
+#   define OGA_DEFAULT_CONFIG_FILE_NAME "default.ini"
+#endif
+#ifndef OGA_DEFAULT_LOGGER_CONFIG_FILE_NAME
+#   define OGA_DEFAULT_LOGGER_CONFIG_FILE_NAME "default-logger.ini"
+#endif
+
+oga::proto::config::object load_application_config() {
+    oga::proto::config::object default_logger_config, default_config, config;
+//    oga::proto::config::parse(OGA_DEFAULT_CONFIG_FILE_PATH, default_config);
+//    oga::proto::config::parse(OGA_DEFAULT_LOGGER_CONFIG_FILE_PATH, default_logger_config);
+//    oga::proto::config::parse(OGA_CONFIG_FILE_PATH, config);
+
+    update(default_config, default_logger_config);
+    update(default_config, config);
+    return default_config;
+}
+
+
+}}}
+ #endif

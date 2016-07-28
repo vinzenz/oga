@@ -18,6 +18,8 @@
 
 #include <oga/core/providers/detail/applications_linux_rpm.hpp>
 
+#if !defined(_WIN32)
+
 #if defined(OGA_WITH_RPM)
 #include <rpm/rpmts.h>
 #include <rpm/rpmdb.h>
@@ -65,3 +67,5 @@ bool applications_linux_rpm::source_modified() const {
 }
 
 }}}}
+
+#endif

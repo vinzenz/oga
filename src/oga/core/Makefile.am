@@ -45,12 +45,5 @@ liboga_core_la_SOURCES+=\
 	providers/detail/applications_windows.hpp \
 	$(NULL)
 
-liboga_core_la_LDFLAGS=$(AM_LDFLAGS) $(OGA_CORE_LDFLAGS)
+liboga_core_la_LDFLAGS=$(AM_LDFLAGS) $(OGA_LDFLAGS)
 
-if OGA_WITH_APT
-liboga_core_la_LDFLAGS+=-lapt-pkg
-endif
-
-if OGA_WITH_RPM
-liboga_core_la_LDFLAGS+=-lrpm
-endif

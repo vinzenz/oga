@@ -15,7 +15,9 @@
 //
 // Refer to the README and COPYING files for full details of the license.
 //
-
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#define __STDC_FORMAT_MACROS 1
 #include <oga/proto/json/json_parser.hpp>
 #if defined(OGA_PROTO_JSON_GENERATE_TEST)
 #include <oga/proto/json/json_generator.hpp>
@@ -136,3 +138,4 @@ int main() {
     }
 }
 
+#pragma GCC diagnostic pop

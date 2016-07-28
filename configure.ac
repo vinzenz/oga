@@ -38,20 +38,34 @@ OGA_CXX_INCLUDES="-I\$(top_srcdir)/src -I\$(top_srcdir)/ext/utf8cpp/source"
 OGA_CXX_FLAGS="-std=c++98 -W -Wall -pedantic \$(OGA_CXX_INCLUDES)"
 OGA_LDFLAGS=""
 
-OGA_CXX_FLAGS+=" -DOGA_WITH_APT"
-OGA_CXX_FLAGS+=" -DOGA_WITH_RPM"
+found_apt_headers=no
 
-OGA_WITH_RPM=1
-OGA_WITH_APT=1
-AM_CONDITIONAL([OGA_WITH_RPM], [test "$OGA_WITH_RPM" = yes])
-AM_CONDITIONAL([OGA_WITH_APT], [test "$OGA_WITH_APT" = yes])
+CFLAGS="-std=c++98"
+AC_CHECK_HEADERS([apt-pkg/cachefile.h apt-pkg/init.h apt-pkg/pkg-cache],
+                 [found_apt_headers=yes])
 
-OGA_LDFLAGS+=" -lapt-pkg"
-OGA_LDFLAGS+=" -lrpm"
+if [test "$found_apt_headers" == "yes"]; then
+    OGA_CXX_FLAGS+=" -DOGA_WITH_APT"
+    OGA_LDFLAGS+=" -lapt-pkg"
+fi
+
+found_rpm_headers=no
+AC_CHECK_HEADERS([rpm/rpmts.h rpm/rpmdb.h rpm/types.h],
+                 [found_rpm_headers=yes])
+
+if [test "$found_rpm_headers" == "yes"]; then
+   OGA_CXX_FLAGS+=" -DOGA_WITH_RPM"
+   OGA_LDFLAGS+=" -lrpm"
+fi
+
+AM_CONDITIONAL([OGA_WITH_RPM], [test "$found_rpm_headers" == "yes"])
+AM_CONDITIONAL([OGA_WITH_APT], [test "$found_apt_headers" == "yes"])
 
 case $host_os in
     mingw*)
-        OGA_LDFLAGS+=" -static -static-libgcc -static-libstdc++"
+        OGA_LDFLAGS+=" -static -static-libgcc -static-libstdc++ -Wl,-Bstatic -lpthread"
+dnl --        OGA_LDFLAGS+=" -Wl,-Bstatic -lwinpthread "
+        OGA_LDFLAGS+=" -Wl,-Bdynamic -loleaut32 -lwbemuuid -lole32 "
     ;;
     *)
         OGA_CXX_FLAGS+=" -pthread"
@@ -62,6 +76,8 @@ esac
 AC_SUBST([OGA_CXX_INCLUDES])
 AC_SUBST([OGA_CXX_FLAGS])
 AC_SUBST([OGA_LDFLAGS])
+
+echo "LDFLAGS: $OGA_LDFLAGS"
 
 AC_CONFIG_FILES([
     Makefile
@@ -74,5 +90,6 @@ AC_CONFIG_FILES([
     src/oga/proto/config/Makefile
     src/oga/proto/json/Makefile
     src/oga/util/Makefile
+    src/oga/util/type_traits/Makefile
 ])
 AC_OUTPUT

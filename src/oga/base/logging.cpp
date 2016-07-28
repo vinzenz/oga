@@ -23,12 +23,18 @@ namespace oga {
 namespace log {
 
 appender_ptr default_appender() {
-    static appender_ptr ptr(new detail::null_appender("default", formatter_ptr(), config()));
+    static appender_ptr ptr(new detail::console_appender("default", formatter_ptr(), config()));
     return ptr;
 }
 
-util::shared_ptr<logger> default_logger() {
-    static util::shared_ptr<logger> ptr(new logger());
+logger_ptr default_logger() {
+    static logger_ptr ptr(new logger());
+    return ptr;
+}
+
+formatter_ptr default_formatter()
+{
+    static formatter_ptr ptr(new formatter("default", "%(asctime)s %(levelname)s %(name) - %(message)s"));
     return ptr;
 }
 
@@ -128,6 +134,9 @@ void configure_formatters(oga::proto::json::object const & configuration, std::v
 
 namespace {
     std::vector<std::string> get_keys(oga::proto::json::object const & configuration, std::string const & section_name) {
+        if(!configuration.is_object(section_name) || !configuration[section_name].get_object().is_string("keys")) {
+            return std::vector<std::string>();
+        }
         config section = configuration[section_name].get_object(config());
         return util::split(section["keys"].get_string(""), ',');
     }

@@ -24,6 +24,7 @@
 
 #include <oga/proto/config/config_parser.hpp>
 #include <oga/util/shared_ptr.hpp>
+#include <oga/base/logging.hpp>
 
 namespace oga {
 namespace core {
@@ -32,11 +33,24 @@ namespace detail {
 
 class applications {
 public:
+    applications(oga::log::logger_ptr logger)
+    : logger_(logger)
+    , impl_()
+    {}
+
     virtual ~applications(){}
-    virtual bool is_available() const = 0;
     virtual bool source_modified() const = 0;
     virtual oga::error_type refresh(std::set<std::string> & apps) = 0;
     virtual oga::error_type configure(oga::proto::config::object const & cfg) = 0;
+
+    virtual bool is_available() const {
+        return impl_.ptr() != 0;
+    }
+public:
+    struct impl { virtual ~impl(){} };
+protected:
+    oga::log::logger_ptr logger_;
+    oga::util::shared_ptr<impl> impl_;
 };
 typedef oga::util::shared_ptr<applications> applications_ptr;
 

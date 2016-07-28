@@ -65,6 +65,7 @@ error_type get_last_system_error();
 
 error_type app_error(int32_t code, error_severity sev = kESevError);
 error_type sys_error(int32_t code, error_severity sev = kESevError);
+error_type com_error(int32_t code);
 
 error_type success();
 

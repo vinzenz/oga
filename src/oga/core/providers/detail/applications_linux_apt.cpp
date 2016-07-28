@@ -16,7 +16,9 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
+#if !defined(_WIN32)
 #include <oga/core/providers/detail/applications_linux_apt.hpp>
+
 
 #if defined(OGA_WITH_APT)
 #include <oga/util/split.hpp>
@@ -84,10 +86,8 @@ oga::error_type applications_linux_apt::refresh(std::set<std::string> & result)
             }
         }
     }
-    return success();
-#else
-    return app_error();
 #endif
+    return success();
 }
 
 bool applications_linux_apt::source_modified() const {
@@ -97,3 +97,5 @@ bool applications_linux_apt::source_modified() const {
 
 
 }}}}
+
+#endif

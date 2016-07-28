@@ -16,37 +16,21 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
-
-#include <oga/core/providers/detail/applications_windows.hpp>
-
-#if defined(_WIN32)
+#ifndef GUARD_OGA_UTIL_TYPE_TRAITS_INTEGRAL_TYPE_HPP_INCLUDED
+#define GUARD_OGA_UTIL_TYPE_TRAITS_INTEGRAL_TYPE_HPP_INCLUDED
 
 namespace oga {
-namespace core {
-namespace providers {
-namespace detail {
+namespace util {
+namespace type_traits {
 
-applications_windows::applications_windows(oga::log::logger_ptr logger)
-: applications(logger)
-{
-}
+template<
+    typename IntegralType,
+    IntegralType Value
+> struct integral_type {
+    typedef IntegralType type;
+    static IntegralType const value = Value;
+};
 
-bool applications_windows::source_modified() const
-{
-    return true;
-}
+}}}
 
-oga::error_type applications_windows::refresh(std::set<std::string> & /*apps*/)
-{
-    return success();
-}
-
-oga::error_type applications_windows::configure(oga::proto::config::object const & /*cfg*/)
-{
-    return success();
-}
-
-
-}}}}
-
-#endif
+#endif // GUARD_OGA_UTIL_TYPE_TRAITS_INTEGRAL_TYPE_HPP_INCLUDED

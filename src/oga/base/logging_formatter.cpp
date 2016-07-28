@@ -25,17 +25,6 @@
 #include <time.h>
 #include <memory.h>
 #include <oga/proto/json/json_generator.hpp>
-#if !defined(_MSC_VER)
-#   include <inttypes.h>
-#else // defined(_MSC_VER)
-#   if !defined(PRIi64)
-#       define PRIi64 "I64d"
-#   endif
-#endif
-
-#if !defined(PRIi64)
-#   error PRIi64 not defined
-#endif
 
 namespace oga {
 namespace log {
@@ -75,9 +64,9 @@ namespace fmt {
             "{8}", "{9}", "{10}", "{11}", "{12}", "{13}", "{14}", "{15}"};
         static std::vector<std::string> cache(tmp, tmp + (sizeof(tmp)/ sizeof(tmp[0])));
         while(n >= cache.size()) {
-            char buf[0x100] = {};
-            std::snprintf(buf, sizeof(buf), "{%" PRIi64 "}", (cache.size()));
-            cache.push_back(buf);
+            std::ostringstream ostr;
+            ostr << '{' << cache.size() << '}';
+            cache.push_back(ostr.str());
         }
         return cache[n];
     }

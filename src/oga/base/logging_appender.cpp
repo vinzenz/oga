@@ -39,14 +39,13 @@ appender::~appender()
 
 error_type appender::append(log::data const & d) {
     std::string message;
-    if(formatter_) {
-        error_type result = formatter_->apply(message, d);
-        if(result.code() == kAppErrSuccess) {
-            if(next()) {
-                next()->write(message);
-            }
-            return write(message);
+    formatter_ptr used_formatter = formatter_ ? formatter_ : default_formatter();
+    error_type result = used_formatter->apply(message, d);
+    if(result.code() == kAppErrSuccess) {
+        if(next()) {
+            next()->write(message);
         }
+        return write(message);
     }
     if(next()) {
         next()->write(message);
