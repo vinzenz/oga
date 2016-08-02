@@ -35,11 +35,17 @@ public:
     virtual ~wmi_client();
 
     oga::error_type connect();
-    oga::error_type disconnect();
-    oga::error_type query(oga::proto::json::array & result,
+	oga::error_type disconnect();
+
+	oga::error_type query(oga::proto::json::array & result,
                           std::vector<std::string> const & fields,
                           std::string const & q);
 
+	oga::error_type query(oga::proto::json::array & result,
+						  std::string const & q);
+
+	oga::error_type get_names(std::vector<std::string> & names,
+							  std::string const & table_name);
 protected:
     oga::log::logger_ptr logger_;
     _com_ptr_t<_com_IIID<IWbemLocator, &IID_IWbemLocator> > locator_;

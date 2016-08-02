@@ -77,7 +77,7 @@ namespace fmt {
             std::string const & idx_str = format_index_str(i);
             size_t idx = f.find(idx_str);
             if(idx != std::string::npos) {
-                f.replace(idx, idx_str.size(), strip_copy(oga::proto::json::generate(v[i]), std::string("\"")));
+				f.replace(idx, idx_str.size(), strip_copy(oga::proto::json::generate(v[i]), std::string("\"")));
                 // Since we found it, lets continue to find it until we have found all instances
                 --i;
             }

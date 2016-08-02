@@ -108,7 +108,7 @@ namespace {
         return caster.handle;
     }
 
-    void reg_closer(private_reg_handle_t* key) {
+    void reg_closer(private_reg_handle_t const * key) {
         registry_force_cast caster;
         caster.handle = key;
         if(key == 0 || (caster.size & size_t(0xFFFFFF00)) == size_t(0x80000000)) {

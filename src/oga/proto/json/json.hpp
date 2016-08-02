@@ -138,6 +138,8 @@ namespace json {
     template<> struct tag<double> { typedef double type; };
     template<> struct tag<float> { typedef double type; };
     template<> struct tag<bool> { typedef bool type; };
+	template<> struct tag<array> { typedef array type; };
+	template<> struct tag<object> { typedef object type; };
 
     template< typename T >
     inline value to_value(T const & v, typename tag<T>::type* = 0) {

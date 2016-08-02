@@ -19,10 +19,12 @@
 #include <oga/base/process.hpp>
 
 namespace oga {
-    process::process(
+#if 0
+	popen::popen(
             std::string const & cmdline,
             std::string const & working_directory,
             popen_flags flags /*= kPopenRead*/)
     : info_(cmdline, working_directory, flags)
     {}
+#endif
 }

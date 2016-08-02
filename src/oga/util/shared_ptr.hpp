@@ -25,6 +25,7 @@
 namespace oga {
 namespace util {
 
+
 template< typename T >
 void deleter(T * p) {
     delete p;
@@ -34,37 +35,54 @@ template< typename T >
 class shared_ptr {
     template<typename U>
     friend class shared_ptr;
+
+	struct aux {
+		aux(size_t count_) : count(count){}
+		virtual ~aux() {}
+
+		size_t count;
+		virtual void destroy() = 0;
+	};
+
+	template< typename U, typename Closer>
+	struct holder : aux {
+		Closer closer_;
+		U * ptr_;
+		holder(U * ptr, Closer closer, size_t count)
+		: aux(count)
+		, closer_(closer)
+		, ptr_(ptr) {
+		}
+		virtual void destroy() { closer_(ptr_); }
+	};
 public:
     template< typename CloserT >
     explicit shared_ptr(T * t, CloserT closer)
-    : p_(t)
-    , r_(t != 0 ? new size_t(1) : 0)
-    , closer_(reinterpret_cast<void(*)(T*)>(closer))
+    : holder_(new holder<T, CloserT>(t, closer, t != 0 ? 1 : 0))
+	, ptr_(t)
     {
     }
 
+
     explicit shared_ptr(T * t = 0)
-    : p_(t)
-    , r_(t != 0 ? new size_t(1) : 0)
-    , closer_(0)
+    : holder_(new holder<T, void(*)(T*)>(t, deleter<T>, t != 0 ? 1 : 0))
+	, ptr_(t)
     {
     }
 
     shared_ptr(shared_ptr const & rhs)
-    : p_(rhs.p_)
-    , r_(rhs.r_)
-    , closer_(rhs.closer_)
-    {
-        if(r_) ++(*r_);
+    : holder_(rhs.holder_)
+	, ptr_(rhs.ptr_)
+	{
+        if(holder_) ++holder_->count;
     }
 
     template< typename U >
     shared_ptr(shared_ptr<U> const & rhs)
-    : p_(static_cast<U* const>(rhs.p_))
-    , r_(rhs.r_)
-    , closer_(reinterpret_cast<void(*)(T*)>(rhs.closer_))
+    : holder_(rhs.holder_)
+    , ptr_(rhs.ptr_)
     {
-        if(r_) ++(*r_);
+		if (holder_) ++holder_->count;
     }
 
     virtual ~shared_ptr() {
@@ -77,9 +95,8 @@ public:
     }
 
     void swap(shared_ptr<T> & rhs) {
-        std::swap(p_, rhs.p_);
-        std::swap(r_, rhs.r_);
-        std::swap(closer_, rhs.closer_);
+        std::swap(holder_, rhs.holder_);
+		std::swap(ptr_, rhs.ptr_);
     }
 
     template< typename CloserT>
@@ -98,11 +115,11 @@ public:
     }
 
     T const * ptr() const {
-        return p_;
+        return ptr_;
     }
 
     T * ptr() {
-        return p_;
+        return ptr_;
     }
 
     T const * operator->() const {
@@ -123,23 +140,20 @@ public:
 
 protected:
     void unref() {
-        if(p_ && r_) {
-            if(--(*r_) == 0) {
-                if(p_) {
-                    if(closer_) closer_(p_);
-                    else deleter(p_);
+        if(ptr_ && holder_) {
+            if(--holder_->count == 0) {
+                if(ptr_) {
+					if (holder_) holder_->destroy();
                 }
-                delete r_;
-                p_ = 0;                
-                r_ = 0;
-                closer_ = 0;
+                delete holder_;
+                ptr_ = 0;
+                holder_ = 0;
             }
         }
     }
 protected:
-    T* p_;
-    size_t* r_;
-    void (*closer_)(T *);
+    T* ptr_;
+	aux *holder_;
 };
 
 template< typename T >

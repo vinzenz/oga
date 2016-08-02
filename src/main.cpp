@@ -116,7 +116,8 @@ int main(int argc, char const **argv) {
         printf("Connected!\n");
         std::vector<std::string> fields;
         oga::proto::json::array wmi_result;
-        wmi.query(wmi_result, oga::util::split(std::string(argv[1]), '|'), argv[2]);
+        wmi.query(wmi_result, oga::util::split(std::string("Name|ProcessId|Handle"), '|'), "Select * From Win32_Process");
+		OGA_LOG_INFO(oga::log::get("root"), "Result:\n{0}\n") % wmi_result;
     } else {
         OGA_LOG_ERROR(oga::log::get("root"), "Failed to connect to WMI provider: {0}") % wmi_err.code();
     }

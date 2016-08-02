@@ -54,7 +54,7 @@ enum registry_value_type {
     kRegValUnknown                  = 255
 };
 
-struct registry_handle;
+class registry_handle;
 class registry_enum_handler {
 public:
     virtual bool operator()(registry_handle const & handle,

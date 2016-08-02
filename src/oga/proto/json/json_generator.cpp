@@ -20,9 +20,9 @@
 #include <utf8/checked.h>
 #include <cstdio>
 
+#if !defined(_MSC_VER)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat"
-#if !defined(_MSC_VER)
 #   define __STDC_FORMAT_MACROS 1
 #   include <inttypes.h>
 #else // defined(_MSC_VER)
@@ -147,4 +147,6 @@ std::string generate(value const & val) {
 
 }}}
 
+#ifndef _MSC_VER
 #pragma GCC diagnostic pop
+#endif

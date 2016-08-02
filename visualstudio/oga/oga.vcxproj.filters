@@ -1,0 +1,324 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\oga">
+      <UniqueIdentifier>{4ab038b1-d3de-4f21-b893-ae92a4653356}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\base">
+      <UniqueIdentifier>{3e68a35a-75e1-4ece-b8d1-5e41607a7ac1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\comm">
+      <UniqueIdentifier>{c993b07a-65ee-42a8-b928-1f4e60607fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\core">
+      <UniqueIdentifier>{79c4bd84-c71a-4ce7-b729-ddbe90d99219}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\handlers">
+      <UniqueIdentifier>{5387667c-d899-4455-a45a-ac622dccb1c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\proto">
+      <UniqueIdentifier>{aea74d80-c6b9-4b2a-b35a-cf6f3a2053f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\proto\json">
+      <UniqueIdentifier>{cef7545f-1533-4cf7-ae44-02fe8c605303}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\proto\config">
+      <UniqueIdentifier>{31c4fb33-a4b5-4bf0-91fd-936de58b8592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\util">
+      <UniqueIdentifier>{c62a2139-4acf-471b-8da4-89de0a20dfa1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\util\type_traits">
+      <UniqueIdentifier>{cacbe85e-1185-474d-afe8-92edd4b27b04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\core\detail">
+      <UniqueIdentifier>{1dd1ab73-3365-4b45-8302-1511c50aaabb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\core\providers">
+      <UniqueIdentifier>{2ae0f88d-2a09-4c34-98cc-267e2391a10a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\core\providers\detail">
+      <UniqueIdentifier>{b9a3c055-1bbf-410a-a460-b26b0b556ac6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\base\detail">
+      <UniqueIdentifier>{824845e9-0180-45f8-a553-c07283de771d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\oga\comm\detail">
+      <UniqueIdentifier>{995f309c-2dcb-428d-bf8f-188fd7b60920}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga">
+      <UniqueIdentifier>{e729cc76-dbf2-4832-b5d2-8ff7a09e896a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\base">
+      <UniqueIdentifier>{2f7b963d-b244-455d-9475-c75043486877}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\base\detail">
+      <UniqueIdentifier>{6fb4865e-ce97-45e6-8faa-efe2295f8003}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\comm">
+      <UniqueIdentifier>{c3d8fae5-0328-41d5-aeba-25bf95d75dd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\comm\detail">
+      <UniqueIdentifier>{557eb0e3-6cc5-4560-a56c-00b5ebb67145}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\core">
+      <UniqueIdentifier>{f418a3c1-b4ed-4e29-929c-0fa49b868d3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\core\detail">
+      <UniqueIdentifier>{31f473dc-b222-4df6-8559-59f4b31e3bf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\core\providers">
+      <UniqueIdentifier>{0b21457d-0edb-43f8-81ba-1035e95585d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\core\providers\detail">
+      <UniqueIdentifier>{e5d5f375-1e3e-4bb6-a201-b5b7adf47196}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\handlers">
+      <UniqueIdentifier>{1d480139-e0ad-4911-b0aa-a5f1e17a6d7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\proto">
+      <UniqueIdentifier>{8fa36cb9-c538-4e95-9b44-e04910a5a3b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\proto\json">
+      <UniqueIdentifier>{8892df13-3258-4103-a24e-5e17ff6efc9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\proto\config">
+      <UniqueIdentifier>{b1f3bf9b-a492-4160-bf6c-71d056d02313}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\util">
+      <UniqueIdentifier>{e26b81e0-7e67-4bda-8e40-866d8956770f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\oga\util\type_traits">
+      <UniqueIdentifier>{0c6015dc-f0df-46e1-8bf3-5d069bce6b46}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\oga\base\detail\process_posix.cpp">
+      <Filter>Source Files\oga\base\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\base\detail\process_windows.cpp">
+      <Filter>Source Files\oga\base\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\base\detail\thread_posix.cpp">
+      <Filter>Source Files\oga\base\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\base\detail\thread_windows.cpp">
+      <Filter>Source Files\oga\base\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\base\logging_logger.cpp">
+      <Filter>Source Files\oga\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\base\logging_formatter.cpp">
+      <Filter>Source Files\oga\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\base\logging_appender.cpp">
+      <Filter>Source Files\oga\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\base\errors.cpp">
+      <Filter>Source Files\oga\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\base\process.cpp">
+      <Filter>Source Files\oga\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\base\logging.cpp">
+      <Filter>Source Files\oga\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\comm\connection.cpp">
+      <Filter>Source Files\oga\comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\comm\detail\connection_linux.cpp">
+      <Filter>Source Files\oga\comm\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\comm\detail\connection_windows.cpp">
+      <Filter>Source Files\oga\comm\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\comm\detail\implementation_base.cpp">
+      <Filter>Source Files\oga\comm\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\core\agent.cpp">
+      <Filter>Source Files\oga\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\core\data_provider.cpp">
+      <Filter>Source Files\oga\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\core\logic.cpp">
+      <Filter>Source Files\oga\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\core\providers\detail\applications_linux_apt.cpp">
+      <Filter>Source Files\oga\core\providers\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\core\providers\detail\applications_linux_rpm.cpp">
+      <Filter>Source Files\oga\core\providers\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\core\providers\detail\applications_windows.cpp">
+      <Filter>Source Files\oga\core\providers\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\core\providers\applications.cpp">
+      <Filter>Source Files\oga\core\providers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\core\detail\config_loader.cpp">
+      <Filter>Source Files\oga\core\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\core\detail\config_loader_linux.cpp">
+      <Filter>Source Files\oga\core\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\core\detail\config_loader_windows.cpp">
+      <Filter>Source Files\oga\core\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\proto\config\config_parser.cpp">
+      <Filter>Source Files\oga\proto\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\proto\json\json.cpp">
+      <Filter>Source Files\oga\proto\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\proto\json\json_generator.cpp">
+      <Filter>Source Files\oga\proto\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\proto\json\json_parser.cpp">
+      <Filter>Source Files\oga\proto\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\util\encoding.cpp">
+      <Filter>Source Files\oga\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\util\registry.cpp">
+      <Filter>Source Files\oga\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\util\wmiclient.cpp">
+      <Filter>Source Files\oga\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\oga\base\detail\thread.hpp">
+      <Filter>Header Files\oga\base\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\base\detail\process.hpp">
+      <Filter>Header Files\oga\base\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\base\error_def.hpp">
+      <Filter>Header Files\oga\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\base\errors.hpp">
+      <Filter>Header Files\oga\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\base\logging.hpp">
+      <Filter>Header Files\oga\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\base\logging_appender.hpp">
+      <Filter>Header Files\oga\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\base\process.hpp">
+      <Filter>Header Files\oga\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\base\thread.hpp">
+      <Filter>Header Files\oga\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\base\types.hpp">
+      <Filter>Header Files\oga\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\comm\connection.hpp">
+      <Filter>Header Files\oga\comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\comm\detail\connection_linux.hpp">
+      <Filter>Header Files\oga\comm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\comm\detail\connection_windows.hpp">
+      <Filter>Header Files\oga\comm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\comm\detail\implementation_base.hpp">
+      <Filter>Header Files\oga\comm\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\core\agent.hpp">
+      <Filter>Header Files\oga\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\core\data_provider.hpp">
+      <Filter>Header Files\oga\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\core\logic.hpp">
+      <Filter>Header Files\oga\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\core\providers\detail\applications.hpp">
+      <Filter>Header Files\oga\core\providers\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\core\providers\detail\applications_linux.hpp">
+      <Filter>Header Files\oga\core\providers\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\core\providers\detail\applications_linux_apt.hpp">
+      <Filter>Header Files\oga\core\providers\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\core\providers\detail\applications_linux_rpm.hpp">
+      <Filter>Header Files\oga\core\providers\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\core\providers\detail\applications_windows.hpp">
+      <Filter>Header Files\oga\core\providers\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\core\providers\applications.hpp">
+      <Filter>Header Files\oga\core\providers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\core\detail\config_loader.hpp">
+      <Filter>Header Files\oga\core\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\handlers\handler.hpp">
+      <Filter>Header Files\oga\handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\proto\config\config_parser.hpp">
+      <Filter>Header Files\oga\proto\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\proto\json\json.hpp">
+      <Filter>Header Files\oga\proto\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\proto\json\json_generator.hpp">
+      <Filter>Header Files\oga\proto\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\proto\json\json_parser.hpp">
+      <Filter>Header Files\oga\proto\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\enable_if.hpp">
+      <Filter>Header Files\oga\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\encoding.hpp">
+      <Filter>Header Files\oga\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\registry.hpp">
+      <Filter>Header Files\oga\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\shared_ptr.hpp">
+      <Filter>Header Files\oga\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\split.hpp">
+      <Filter>Header Files\oga\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\string_appender.hpp">
+      <Filter>Header Files\oga\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\strip.hpp">
+      <Filter>Header Files\oga\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\wmiclient.hpp">
+      <Filter>Header Files\oga\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\type_traits\boolean.hpp">
+      <Filter>Header Files\oga\util\type_traits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\type_traits\integral_type.hpp">
+      <Filter>Header Files\oga\util\type_traits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\type_traits\is_same.hpp">
+      <Filter>Header Files\oga\util\type_traits</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

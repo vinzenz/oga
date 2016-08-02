@@ -20,6 +20,7 @@
 #include <oga/util/encoding.hpp>
 
 #if defined(_WIN32)
+#include <map>
 #include <comdef.h>
 #include <wbemidl.h>
 
@@ -38,7 +39,7 @@ namespace _com_util {
         const size_t length = lstrlenA(a);
         oga::util::utf16_string u16 = oga::util::utf8_to_utf16(a, a + length);
         BSTR bstr = SysAllocStringLen(NULL, u16.size() + 1);
-        memcpy(bstr, u16.c_str(), u16.size());
+        memcpy(bstr, u16.c_str(), sizeof(oga::util::utf16_char_t) * u16.size());
         return bstr;
     }
 }
@@ -104,6 +105,7 @@ oga::proto::json::value variant_to_json_value(_variant_t const & v) {
         result = oga::proto::json::to_value((UINT)v);
         break;
     case VT_LPSTR:
+	case VT_BSTR:
     case VT_LPWSTR:
         result = oga::proto::json::to_value(std::string(_bstr_t(v)));
         break;
@@ -142,6 +144,7 @@ oga::proto::json::value variant_to_json_value(_variant_t const & v) {
         result = oga::proto::json::to_value((double)v);
         break;
     default:
+		OGA_LOG_WARN(oga::log::get("root"), "Unknown COM VariantType value type {0} - Do not know how to convert") % v.vt;
     case VT_EMPTY:
     case VT_NULL:
         break;
@@ -149,15 +152,99 @@ oga::proto::json::value variant_to_json_value(_variant_t const & v) {
     return result;
 }
 
+oga::error_type wmi_client::get_names(std::vector<std::string> & names,
+			                          std::string const & table_name)
+{
+
+	return success();
+}
+
+oga::error_type wmi_client::query(oga::proto::json::array & result,
+								  std::string const & q)
+{
+	_com_ptr_t<_com_IIID<IEnumWbemClassObject, &IID_IEnumWbemClassObject> > enumerator;
+	HRESULT code = services_->ExecQuery(
+		L"WQL",
+		ConvertStringToBSTR(q.c_str()),
+		WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
+		0,
+		&enumerator
+		);
+	if (FAILED(code)) {
+		OGA_LOG_WARN(logger_, "Failed to execute query '{0}' with Code: {1}") % q % hex(code);
+		return com_error(code);
+	}
+	std::vector<std::string> fields;
+	static std::map<std::string, std::vector<std::string> > fields_map;
+
+	_com_ptr_t<_com_IIID<IWbemClassObject, &IID_IWbemClassObject> > object;
+	ULONG num_elements = 0;
+	do {
+		code = enumerator->Next(LONG(WBEM_INFINITE), 1, &object, &num_elements);
+		if (FAILED(code)) {
+			OGA_LOG_WARN(logger_, "Failed to get next element on query '{0}' with Code: {1}") % q % hex(code);
+			break;
+		}
+		if (num_elements > 0) {
+			oga::proto::json::object row;
+			_variant_t class_name;
+			code = object->Get(L"__CLASS", 0, &class_name, 0, 0);
+			if (class_name.vt == VT_BSTR) {
+				std::string tbl_name = (char const *)_bstr_t(class_name);
+				if (fields_map.count(tbl_name) == 0 || fields_map.empty()) {
+					SAFEARRAY * array = NULL;
+					code = object->GetNames(NULL, WBEM_FLAG_LOCAL_ONLY, NULL, &array);
+					if (FAILED(code)) {
+						OGA_LOG_WARN(logger_, "WMI: Failed to get property names from enumerated object - query was '{0}' error was {1} - Result ignored") % q % hex(code);
+						continue;
+					}
+					else {
+						BSTR * name_list = 0;
+						::SafeArrayAccessData(array, (LPVOID*)&name_list);
+						LONG ubound = 0, lbound = 0;
+						SafeArrayGetLBound(array, 1, &lbound);
+						SafeArrayGetUBound(array, 1, &ubound);
+						LONG count = ubound - lbound + 1;
+						for (LONG i = 0; i < count; ++i) {
+							fields.push_back((char const *)_bstr_t(name_list[i]));
+						}
+
+						::SafeArrayUnaccessData(array);
+						::SafeArrayDestroy(array);
+					}
+					fields_map[tbl_name] = fields;
+				}
+			}
+
+			for (size_t i = 0; i < fields.size(); ++i) {
+				_variant_t v;
+				oga::util::utf16_string name = oga::util::utf8_to_utf16(fields[i].c_str(), fields[i].c_str() + fields[i].size());
+				code = object->Get(name.c_str(), 0, &v, 0, 0);
+				if (FAILED(code)) {
+					OGA_LOG_WARN(logger_, "Failed to get value for field '{0}' in query '{1}' Code: {2}") % fields[i] % q % hex(code);
+				}
+				else {
+					row[fields[i]] = variant_to_json_value(v);
+				}
+			}
+			result.push_back(row);
+		}
+	} while (num_elements > 0);
+	return success();
+}
+
+
 oga::error_type wmi_client::query(oga::proto::json::array & result,
                                   std::vector<std::string> const & fields,
                                   std::string const & q)
 {
+	if (fields.empty()) return query(result, q);
+
     _com_ptr_t<_com_IIID<IEnumWbemClassObject, &IID_IEnumWbemClassObject> > enumerator;
     HRESULT code = services_->ExecQuery(
             L"WQL",
             ConvertStringToBSTR(q.c_str()),
-            WBEM_FLAG_FORWARD_ONLY,
+            WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
             0,
             &enumerator
     );
@@ -165,6 +252,7 @@ oga::error_type wmi_client::query(oga::proto::json::array & result,
         OGA_LOG_WARN(logger_, "Failed to execute query '{0}' with Code: {1}") % q % hex(code);
         return com_error(code);
     }
+
     _com_ptr_t<_com_IIID<IWbemClassObject, &IID_IWbemClassObject> > object;
     ULONG num_elements = 0;
     do {
@@ -175,9 +263,11 @@ oga::error_type wmi_client::query(oga::proto::json::array & result,
         }
         if(num_elements > 0) {
             oga::proto::json::object row;
+
             for(size_t i = 0; i <  fields.size(); ++i) {
                 _variant_t v;
-                code = object->Get(_bstr_t(ConvertStringToBSTR(fields[i].c_str())), 0, &v, 0, 0);
+				oga::util::utf16_string name = oga::util::utf8_to_utf16(fields[i].c_str(), fields[i].c_str() + fields[i].size());
+                code = object->Get(name.c_str(), 0, &v, 0, 0);
                 if(FAILED(code)) {
                     OGA_LOG_WARN(logger_, "Failed to get value for field '{0}' in query '{1}' Code: {2}") % fields[i] % q % hex(code);
                 } else {

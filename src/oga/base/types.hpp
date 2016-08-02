@@ -25,10 +25,10 @@ namespace oga {
 typedef INT64 int64_t;
 typedef INT32 int32_t;
 typedef INT16 int16_t;
-typedef INT8 int8_t
+typedef INT8 int8_t;
 
-typedef QWORD uint64_t;
-typedef DWORD uint32_t;
+typedef DWORD64 uint64_t;
+typedef DWORD32 uint32_t;
 typedef WORD uint16_t;
 typedef BYTE uint8_t;
 

@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{94A33C8C-AF68-49C3-A878-D68931F7B293}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>oga</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(SolutionPath)/../../src;$(SolutionPath)/../../ext/utf8cpp/source/;$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(SolutionPath)/../../src;$(SolutionPath)/../../ext/utf8cpp/source/;$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(SolutionPath)/../../src;$(SolutionPath)/../../ext/utf8cpp/source/;$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../src;$(SolutionDir)/../../ext/utf8cpp/source/</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>oleaut32.lib;ole32.lib;wbemuuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../src;$(SolutionDir)/../../ext/utf8cpp/source/</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>oleaut32.lib;ole32.lib;wbemuuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../src;$(SolutionDir)/../../ext/utf8cpp/source/</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>oleaut32.lib;ole32.lib;wbemuuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../../src;$(SolutionDir)/../../ext/utf8cpp/source/</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>oleaut32.lib;ole32.lib;wbemuuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\oga\base\detail\process_posix.cpp" />
+    <ClCompile Include="..\..\src\oga\base\detail\process_windows.cpp" />
+    <ClCompile Include="..\..\src\oga\base\detail\thread_posix.cpp" />
+    <ClCompile Include="..\..\src\oga\base\detail\thread_windows.cpp" />
+    <ClCompile Include="..\..\src\oga\base\errors.cpp" />
+    <ClCompile Include="..\..\src\oga\base\logging.cpp" />
+    <ClCompile Include="..\..\src\oga\base\logging_appender.cpp" />
+    <ClCompile Include="..\..\src\oga\base\logging_formatter.cpp" />
+    <ClCompile Include="..\..\src\oga\base\logging_logger.cpp" />
+    <ClCompile Include="..\..\src\oga\base\process.cpp" />
+    <ClCompile Include="..\..\src\oga\comm\connection.cpp" />
+    <ClCompile Include="..\..\src\oga\comm\detail\connection_linux.cpp" />
+    <ClCompile Include="..\..\src\oga\comm\detail\connection_windows.cpp" />
+    <ClCompile Include="..\..\src\oga\comm\detail\implementation_base.cpp" />
+    <ClCompile Include="..\..\src\oga\core\agent.cpp" />
+    <ClCompile Include="..\..\src\oga\core\data_provider.cpp" />
+    <ClCompile Include="..\..\src\oga\core\detail\config_loader.cpp" />
+    <ClCompile Include="..\..\src\oga\core\detail\config_loader_linux.cpp" />
+    <ClCompile Include="..\..\src\oga\core\detail\config_loader_windows.cpp" />
+    <ClCompile Include="..\..\src\oga\core\logic.cpp" />
+    <ClCompile Include="..\..\src\oga\core\providers\applications.cpp" />
+    <ClCompile Include="..\..\src\oga\core\providers\detail\applications_linux_apt.cpp" />
+    <ClCompile Include="..\..\src\oga\core\providers\detail\applications_linux_rpm.cpp" />
+    <ClCompile Include="..\..\src\oga\core\providers\detail\applications_windows.cpp" />
+    <ClCompile Include="..\..\src\oga\proto\config\config_parser.cpp" />
+    <ClCompile Include="..\..\src\oga\proto\json\json.cpp" />
+    <ClCompile Include="..\..\src\oga\proto\json\json_generator.cpp" />
+    <ClCompile Include="..\..\src\oga\proto\json\json_parser.cpp" />
+    <ClCompile Include="..\..\src\oga\util\encoding.cpp" />
+    <ClCompile Include="..\..\src\oga\util\registry.cpp" />
+    <ClCompile Include="..\..\src\oga\util\wmiclient.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\oga\base\detail\process.hpp" />
+    <ClInclude Include="..\..\src\oga\base\detail\thread.hpp" />
+    <ClInclude Include="..\..\src\oga\base\errors.hpp" />
+    <ClInclude Include="..\..\src\oga\base\error_def.hpp" />
+    <ClInclude Include="..\..\src\oga\base\logging.hpp" />
+    <ClInclude Include="..\..\src\oga\base\logging_appender.hpp" />
+    <ClInclude Include="..\..\src\oga\base\process.hpp" />
+    <ClInclude Include="..\..\src\oga\base\thread.hpp" />
+    <ClInclude Include="..\..\src\oga\base\types.hpp" />
+    <ClInclude Include="..\..\src\oga\comm\connection.hpp" />
+    <ClInclude Include="..\..\src\oga\comm\detail\connection_linux.hpp" />
+    <ClInclude Include="..\..\src\oga\comm\detail\connection_windows.hpp" />
+    <ClInclude Include="..\..\src\oga\comm\detail\implementation_base.hpp" />
+    <ClInclude Include="..\..\src\oga\core\agent.hpp" />
+    <ClInclude Include="..\..\src\oga\core\data_provider.hpp" />
+    <ClInclude Include="..\..\src\oga\core\detail\config_loader.hpp" />
+    <ClInclude Include="..\..\src\oga\core\logic.hpp" />
+    <ClInclude Include="..\..\src\oga\core\providers\applications.hpp" />
+    <ClInclude Include="..\..\src\oga\core\providers\detail\applications.hpp" />
+    <ClInclude Include="..\..\src\oga\core\providers\detail\applications_linux.hpp" />
+    <ClInclude Include="..\..\src\oga\core\providers\detail\applications_linux_apt.hpp" />
+    <ClInclude Include="..\..\src\oga\core\providers\detail\applications_linux_rpm.hpp" />
+    <ClInclude Include="..\..\src\oga\core\providers\detail\applications_windows.hpp" />
+    <ClInclude Include="..\..\src\oga\handlers\handler.hpp" />
+    <ClInclude Include="..\..\src\oga\proto\config\config_parser.hpp" />
+    <ClInclude Include="..\..\src\oga\proto\json\json.hpp" />
+    <ClInclude Include="..\..\src\oga\proto\json\json_generator.hpp" />
+    <ClInclude Include="..\..\src\oga\proto\json\json_parser.hpp" />
+    <ClInclude Include="..\..\src\oga\util\enable_if.hpp" />
+    <ClInclude Include="..\..\src\oga\util\encoding.hpp" />
+    <ClInclude Include="..\..\src\oga\util\registry.hpp" />
+    <ClInclude Include="..\..\src\oga\util\shared_ptr.hpp" />
+    <ClInclude Include="..\..\src\oga\util\split.hpp" />
+    <ClInclude Include="..\..\src\oga\util\string_appender.hpp" />
+    <ClInclude Include="..\..\src\oga\util\strip.hpp" />
+    <ClInclude Include="..\..\src\oga\util\type_traits\boolean.hpp" />
+    <ClInclude Include="..\..\src\oga\util\type_traits\integral_type.hpp" />
+    <ClInclude Include="..\..\src\oga\util\type_traits\is_same.hpp" />
+    <ClInclude Include="..\..\src\oga\util\wmiclient.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

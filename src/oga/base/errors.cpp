@@ -41,7 +41,8 @@ public:
                 DWORD(code),
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                 (LPSTR)&text,
-                0);
+                0,
+				0);
         if(err == ERROR_SUCCESS && text != 0) {
             result.assign(text);
             ::LocalFree(text);
