@@ -30,10 +30,12 @@ typedef struct {
     DWORD dwFlags;
 } THREADNAME_INFO;
 
+#if defined(_MSC_VER)
 struct EXCEPTION_REGISTRATION_RECORD {
     _EXCEPTION_REGISTRATION_RECORD* Next;
     PVOID Handler;
 };
+#endif
 #include <poppack.h>
 
 namespace oga {
