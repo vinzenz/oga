@@ -31,8 +31,9 @@ namespace core {
         kProtocolVersionLegacy  = 0,
         kProtocolVersion1       = 1,
         kProtocolVersion2       = 2,        
+		kProtocolVersion3		= 3,
 
-        kProtocolVersionCount,
+		kProtocolVersionCount,
         kProtocolVersionLatest = (kProtocolVersionCount - 1)
     };
 

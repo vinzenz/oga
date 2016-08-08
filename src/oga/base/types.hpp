@@ -21,22 +21,45 @@
 
 #if defined(WIN32) || defined(WIN64)
 #   include <windows.h>
-namespace oga {
-typedef INT64 int64_t;
-typedef INT32 int32_t;
-typedef INT16 int16_t;
-typedef INT8 int8_t;
 
-typedef DWORD64 uint64_t;
-typedef DWORD32 uint32_t;
-typedef WORD uint16_t;
-typedef BYTE uint8_t;
+typedef INT64 oga_int64_t;
+typedef INT32 oga_int32_t;
+typedef INT16 oga_int16_t;
+typedef INT8  oga_int8_t;
 
-}
+typedef DWORD64 oga_uint64_t;
+typedef DWORD32 oga_uint32_t;
+typedef WORD	oga_uint16_t;
+typedef BYTE	oga_uint8_t;
+
 #else
 #   include <stdint.h>
+
+typedef int64_t oga_int64_t;
+typedef int32_t oga_int32_t;
+typedef int16_t oga_int16_t;
+typedef int8_t  oga_int8_t;
+
+typedef uint64_t oga_uint64_t;
+typedef uint32_t oga_uint32_t;
+typedef uint16_t oga_uint16_t;
+typedef uint8_t  oga_uint8_t;
+
 #endif
 
+#if defined(__cplusplus)
+namespace oga {
+	typedef ::oga_int64_t int64_t;
+	typedef ::oga_int32_t int32_t;
+	typedef ::oga_int16_t int16_t;
+	typedef ::oga_int8_t int8_t;
+
+	typedef ::oga_uint64_t uint64_t;
+	typedef ::oga_uint32_t uint32_t;
+	typedef ::oga_uint16_t uint16_t;
+	typedef ::oga_uint8_t uint8_t;
+}
+#endif
 
 #endif //GUARD_OGA_BASE_TYPES_HPP_INCLUDED
 

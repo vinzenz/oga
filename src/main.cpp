@@ -16,6 +16,8 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
+#define NOMINMAX
+
 #include <oga/comm/connection.hpp>
 #include <oga/proto/json/json_generator.hpp>
 #include <oga/proto/json/json_parser.hpp>
@@ -33,6 +35,7 @@
 #include <oga/core/providers/detail/applications_windows.hpp>
 #include <oga/util/registry.hpp>
 #include <oga/util/wmiclient.hpp>
+
 
 static char const json_def[] = "{"
     "\"loggers\": {\"keys\": \"root\" },"
@@ -76,9 +79,16 @@ public:
 };
 #endif
 int main(int argc, char const **argv) {
-    oga::core::agent agent;
+#ifdef _DEBUG
+	int flag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+	flag |= _CRTDBG_LEAK_CHECK_DF; // Turn on leak-checking bit
+	_CrtSetDbgFlag(flag);
+	//_CrtSetBreakAlloc(1462);
+#endif
 
-    OGA_LOG_DEBUG(oga::log::get("root"), "Hello World! {0} {1} {0} {1} '{2}' {3} {4} {5}") % "Some" % 3 % "arguments";
+	oga::core::agent agent;
+
+	OGA_LOG_DEBUG(oga::log::get("root"), "Hello World! {0} {1} {0} {1} '{2}' {3} {4} {5}") % "Some" % 3 % "arguments";
     OGA_LOG_INFO(oga::log::get("root"), "Hello World! {0} {1} '{2}' {3} {4} {5}") % "Some" % 3 % "arguments";
     OGA_LOG_ERROR(oga::log::get("root"), "Hello World! {0} {1} {0} {1} '{2}' {3} {4} {5}") % "Some" % 3 % "arguments";
 #if defined(_WIN32)
@@ -118,7 +128,12 @@ int main(int argc, char const **argv) {
         oga::proto::json::array wmi_result;
         wmi.query(wmi_result, oga::util::split(std::string("Name|ProcessId|Handle"), '|'), "Select * From Win32_Process");
 		OGA_LOG_INFO(oga::log::get("root"), "Result:\n{0}\n") % wmi_result;
-    } else {
+		for (size_t i = 0; i < 100; ++i) {
+			wmi_result.clear();
+			wmi.query(wmi_result, "Select * From Win32_Process");
+		}		
+		OGA_LOG_INFO(oga::log::get("root"), "Done for now");
+	} else {
         OGA_LOG_ERROR(oga::log::get("root"), "Failed to connect to WMI provider: {0}") % wmi_err.code();
     }
 #endif
@@ -204,4 +219,5 @@ int main(int argc, char const **argv) {
         printf("Failed to start process: %d - %s\n", e.error().code(), e.what());
     }
 #endif
+	return 0;
 }

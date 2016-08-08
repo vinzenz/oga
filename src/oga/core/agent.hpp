@@ -22,6 +22,7 @@
 #include <oga/base/logging.hpp>
 #include <oga/comm/connection.hpp>
 #include <oga/proto/config/config_parser.hpp>
+#include <oga/handlers/message_loop.hpp>
 
 namespace oga {
 namespace core {
@@ -32,11 +33,17 @@ namespace core {
         oga::proto::config::object const & config() const {
             return config_;
         }
+
+		oga::message_loop & loop() {
+			return loop_;
+		}
+
     protected:
-        // oga::comm::connection connection_;
         oga::proto::config::object config_;
         oga::log::logger_ptr logger_;
-    };
+		oga::comm::connection connection_;
+		oga::message_loop loop_;
+	};
 }}
 
 #endif //GUARD_OGA_CORE_AGENT_HPP_INCLUDED

@@ -201,6 +201,15 @@
     <ClCompile Include="..\..\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\oga\util\com_str.cpp">
+      <Filter>Source Files\oga\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\handlers\plugin_api.cpp">
+      <Filter>Source Files\oga\handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\oga\base\timer_queue.cpp">
+      <Filter>Source Files\oga\base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\oga\base\detail\thread.hpp">
@@ -319,6 +328,21 @@
     </ClInclude>
     <ClInclude Include="..\..\src\oga\util\type_traits\is_same.hpp">
       <Filter>Header Files\oga\util\type_traits</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\util\com_str.hpp">
+      <Filter>Header Files\oga\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\handlers\plugin.hpp">
+      <Filter>Header Files\oga\handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\handlers\plugin_api.h">
+      <Filter>Header Files\oga\handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\handlers\message_loop.hpp">
+      <Filter>Header Files\oga\handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\oga\base\timer_queue.hpp">
+      <Filter>Header Files\oga\base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

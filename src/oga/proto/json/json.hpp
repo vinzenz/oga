@@ -55,7 +55,8 @@ namespace json {
     class any_value : public any_value_base {
     public:
         any_value(Type const & v)
-        : value_(v)
+        : any_value_base()
+		, value_(v)
         {}
 
         Type & value() {

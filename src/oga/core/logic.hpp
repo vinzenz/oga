@@ -23,16 +23,6 @@
 
 namespace oga {
 
-struct message {
-    std::string name;
-    message_args const * args;
-    message_channel const * channel;
-};
-
-struct logic {
-    void dispatch(message const & m);
-
-};
 
 
 }

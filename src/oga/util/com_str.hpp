@@ -16,32 +16,46 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
-#include <oga/core/agent.hpp>
-#include <oga/core/detail/config_loader.hpp>
+#ifndef GUARD_OGA_UTIL_COM_STR_HPP_INCLUDED
+#define GUARD_OGA_UTIL_COM_STR_HPP_INCLUDED
 
-#ifndef OVIRT_AGENT_VERSION
-#   define OVIRT_AGENT_VERSION "development"
-#endif
+#include <string>
+
+#include <oga/util/encoding.hpp>
+
+#if defined(_WIN32)
 
 namespace oga {
-namespace core {
+namespace util {
 
-agent::agent()
-: config_(detail::load_application_config())
-, logger_()
-, connection_()
-, loop_(connection_)
-{
-    oga::log::configure(config_);
-    logger_ = oga::log::get("agent");
-    OGA_LOG_INFO(logger_, "ovirt-guest-agent started - Version: {0}") % OVIRT_AGENT_VERSION;	
-}
+class com_str {
+public:
+	com_str();
+	explicit com_str(utf8_string const & s);
+	explicit com_str(utf16_string const & s);
+	explicit com_str(BSTR b);
+	virtual ~com_str();
 
-agent::~agent()
-{
-    OGA_LOG_INFO(logger_, "ovirt-guest-agent ended");
-}
+	utf8_string to_utf8() const;
+	utf16_string to_utf16() const;
+	
+	BSTR get() const;
+	BSTR * attach_to();
+	void attach(BSTR str);
+	BSTR detach();
+	bool empty() const;
+	void release();
+
+protected:
+	BSTR bstr_;
 
 
+	com_str(com_str const &);
+	com_str & operator=(com_str const &);
+};
 
 }}
+
+#endif
+
+#endif 

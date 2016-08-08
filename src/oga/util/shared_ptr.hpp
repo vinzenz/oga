@@ -31,25 +31,27 @@ void deleter(T * p) {
     delete p;
 }
 
+struct shared_ptr_aux {
+	shared_ptr_aux(size_t count_) : count(count_) {}
+	virtual ~shared_ptr_aux() {}
+
+	size_t count;
+	virtual void destroy() = 0;
+};
+
 template< typename T >
 class shared_ptr {
     template<typename U>
     friend class shared_ptr;
 
-	struct aux {
-		aux(size_t count_) : count(count){}
-		virtual ~aux() {}
-
-		size_t count;
-		virtual void destroy() = 0;
-	};
 
 	template< typename U, typename Closer>
-	struct holder : aux {
+	struct holder : shared_ptr_aux {
 		Closer closer_;
 		U * ptr_;
+
 		holder(U * ptr, Closer closer, size_t count)
-		: aux(count)
+		: shared_ptr_aux(count)
 		, closer_(closer)
 		, ptr_(ptr) {
 		}
@@ -58,14 +60,14 @@ class shared_ptr {
 public:
     template< typename CloserT >
     explicit shared_ptr(T * t, CloserT closer)
-    : holder_(new holder<T, CloserT>(t, closer, t != 0 ? 1 : 0))
+    : holder_(t != 0 ? new holder<T, CloserT>(t, closer, 1) : 0)
 	, ptr_(t)
     {
     }
 
 
     explicit shared_ptr(T * t = 0)
-    : holder_(new holder<T, void(*)(T*)>(t, deleter<T>, t != 0 ? 1 : 0))
+    : holder_(t != 0 ? new holder<T, void(*)(T*)>(t, deleter<T>, 1) : 0)
 	, ptr_(t)
     {
     }
@@ -78,7 +80,7 @@ public:
     }
 
     template< typename U >
-    shared_ptr(shared_ptr<U> const & rhs)
+    shared_ptr(shared_ptr<U> rhs)
     : holder_(rhs.holder_)
     , ptr_(rhs.ptr_)
     {
@@ -153,7 +155,7 @@ protected:
     }
 protected:
     T* ptr_;
-	aux *holder_;
+	shared_ptr_aux *holder_;
 };
 
 template< typename T >
@@ -189,5 +191,6 @@ private:
 };
 
 }}
+
 
 #endif //GUARD_OGA_UTIL_SHARED_PTR_HPP_INCLUDED

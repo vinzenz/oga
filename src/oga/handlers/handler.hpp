@@ -19,72 +19,44 @@
 #ifndef GUARD_OGA_HANDLERS_HANDLER_HPP_INCLUDED
 #define GUARD_OGA_HANDLERS_HANDLER_HPP_INCLUDED
 
+#include <oga/base/errors.hpp>
+#include <oga/proto/json/json.hpp>
+
+#include <string>
+#include <map>
+
 namespace oga {
 
-struct message_args {
-};
+	class handler {
+	public:
+		virtual ~handler() {}
+		virtual error_type call(oga::proto::json::object const & args = oga::proto::json::object()) = 0;
+	};
 
-struct message_channel {
-};
+	class message_manager {
+		std::map<std::string, oga::util::shared_ptr<handler> > handlers_;
+	public:
+		void set(std::string const & name, oga::util::shared_ptr<handler> handler) {
+			handlers_[name] = handler;
+		}
 
-struct handler_description {
-    // Meta Data
-    char const * name;
-    char const * version;
-    char const * subscribes_to;
+		void drop(std::string const & name) {
+			handlers_.erase(name);
+		}
 
-    // Configuration
-    int timer_interval;
-
-    // Instance Data
-    void * user_data;
-    void (*on_message)(char const * name, message_args const *);
-    void (*on_timer)();
-    void (*set_channel)(message_channel * channel);
-    void (*release)();
-};
-
-class handler_base {
-public:
-    virtual ~handler_base();
-
-    virtual void on_message(std::string const & message, message_args const & args) = 0;
-    virtual void on_timer() = 0;
-    virtual void release() = 0;
-    virtual void set_channel(message_channel * channel);
-};
-
-class plugin_handler : public handler_base {
-public:
-    plugin_handler(handler_description const & description);
-    virtual ~plugin_handler();
-
-    virtual void on_message(std::string const & message, message_args const & args) {
-        if(description_.on_message) {
-            description_.on_message(message.c_str(), &args);
-        }
-    }
-
-    virtual void on_timer() {
-        if(description_.on_timer) {
-            description_.on_timer();
-        }
-    }
-
-    virtual void release() {
-        if(description_.release) {
-            description_.release();
-        }
-    }
-    virtual void set_channel(message_channel * channel) {
-        if(description_.set_channel) {
-            description_.set_channel(channel);
-        }
-    }
-private:
-    handler_description description_;
-};
-
+		void dispatch_message(
+			std::string const & name,
+			oga::proto::json::object const & args) {
+			apply_call(handlers_.find(name), args);
+		}
+	protected:
+		template<typename T>
+		void apply_call(T iter, oga::proto::json::object const & args) {
+			if (iter != handlers_.end()) {
+				iter->second->call(args);
+			}
+		}
+	};
 }
 
 #endif //GUARD_OGA_HANDLERS_HANDLER_HPP_INCLUDED

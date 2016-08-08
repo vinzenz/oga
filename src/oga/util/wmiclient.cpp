@@ -18,6 +18,7 @@
 #define _WIN32_DCOM
 #include <oga/util/wmiclient.hpp>
 #include <oga/util/encoding.hpp>
+#include <oga/util/com_str.hpp>
 
 #if defined(_WIN32)
 #include <map>
@@ -26,6 +27,7 @@
 
 // void __stdcall _com_issue_error(HRESULT /*hr*/) {}
 
+#if !defined(_MSC_VER)
 namespace _com_util {
     char * __stdcall ConvertBSTRToString(BSTR bstr) {
         const unsigned int stringLength = lstrlenW(bstr);
@@ -36,19 +38,25 @@ namespace _com_util {
     }
 
     BSTR __stdcall ConvertStringToBSTR(char const * const a) {
-        const size_t length = lstrlenA(a);
+		const size_t length = lstrlenA(a);
         oga::util::utf16_string u16 = oga::util::utf8_to_utf16(a, a + length);
-        BSTR bstr = SysAllocStringLen(NULL, u16.size() + 1);
-        memcpy(bstr, u16.c_str(), sizeof(oga::util::utf16_char_t) * u16.size());
-        return bstr;
-    }
+		return SysAllocStringLen(u16.c_str(), u16.size());
+	}
 }
+#endif
 
 namespace oga {
 namespace util {
-
+namespace {
+	static std::map<std::string, std::vector<std::string> > fields_map;
+}
 using _com_util::ConvertBSTRToString;
 using _com_util::ConvertStringToBSTR;
+
+void wmi_client::clear_caches() {
+	std::map<std::string, std::vector<std::string> > tmp;
+	fields_map.swap(tmp);
+}
 
 std::string hex(int32_t code) {
     char buffer[11] = {};
@@ -80,7 +88,7 @@ oga::error_type wmi_client::connect()
         OGA_LOG_WARN(logger_, "Failed to create WbemLocator instance. Code: {0}") % hex(res);
         return com_error(res);
     }
-    res = locator_->ConnectServer(_bstr_t(L"root\\CIMV2"), 0, 0, 0, 0, 0, 0, &services_);
+    res = locator_->ConnectServer(L"root\\CIMV2", 0, 0, 0, 0, 0, 0, &services_);
     if(FAILED(res)) {
         OGA_LOG_WARN(logger_, "Failed to connect to server Code: {0}") % hex(res);
         return com_error(res);
@@ -104,11 +112,12 @@ oga::proto::json::value variant_to_json_value(_variant_t const & v) {
     case VT_UINT:
         result = oga::proto::json::to_value((UINT)v);
         break;
-    case VT_LPSTR:
-	case VT_BSTR:
-    case VT_LPWSTR:
-        result = oga::proto::json::to_value(std::string(_bstr_t(v)));
-        break;
+	case VT_BSTR: {
+			com_str tmp(v.bstrVal);
+			result = oga::proto::json::to_value(tmp.to_utf8());
+			tmp.detach();
+		}
+		break;
     case VT_BOOL:
         result = oga::proto::json::to_value((BOOL)v);
         break;
@@ -169,13 +178,12 @@ oga::error_type wmi_client::query(oga::proto::json::array & result,
 		WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
 		0,
 		&enumerator
-		);
+	);
 	if (FAILED(code)) {
 		OGA_LOG_WARN(logger_, "Failed to execute query '{0}' with Code: {1}") % q % hex(code);
 		return com_error(code);
 	}
-	std::vector<std::string> fields;
-	static std::map<std::string, std::vector<std::string> > fields_map;
+	std::vector<std::string> fields;	
 
 	_com_ptr_t<_com_IIID<IWbemClassObject, &IID_IWbemClassObject> > object;
 	ULONG num_elements = 0;
@@ -188,9 +196,11 @@ oga::error_type wmi_client::query(oga::proto::json::array & result,
 		if (num_elements > 0) {
 			oga::proto::json::object row;
 			_variant_t class_name;
-			code = object->Get(L"__CLASS", 0, &class_name, 0, 0);
+			code = object->Get(L"__CLASS", 0, class_name.GetAddress(), 0, 0);
 			if (class_name.vt == VT_BSTR) {
-				std::string tbl_name = (char const *)_bstr_t(class_name);
+				com_str tmp(class_name.bstrVal);
+				std::string tbl_name = tmp.to_utf8();
+				tmp.detach();
 				if (fields_map.count(tbl_name) == 0 || fields_map.empty()) {
 					SAFEARRAY * array = NULL;
 					code = object->GetNames(NULL, WBEM_FLAG_LOCAL_ONLY, NULL, &array);
@@ -206,10 +216,13 @@ oga::error_type wmi_client::query(oga::proto::json::array & result,
 						SafeArrayGetUBound(array, 1, &ubound);
 						LONG count = ubound - lbound + 1;
 						for (LONG i = 0; i < count; ++i) {
-							fields.push_back((char const *)_bstr_t(name_list[i]));
+							com_str c(name_list[i]);
+							fields.push_back(c.to_utf8());
+							c.detach();
 						}
 
 						::SafeArrayUnaccessData(array);
+						::SafeArrayDestroyData(array);
 						::SafeArrayDestroy(array);
 					}
 					fields_map[tbl_name] = fields;
@@ -217,7 +230,7 @@ oga::error_type wmi_client::query(oga::proto::json::array & result,
 			}
 
 			for (size_t i = 0; i < fields.size(); ++i) {
-				_variant_t v;
+				_variant_t v;				
 				oga::util::utf16_string name = oga::util::utf8_to_utf16(fields[i].c_str(), fields[i].c_str() + fields[i].size());
 				code = object->Get(name.c_str(), 0, &v, 0, 0);
 				if (FAILED(code)) {

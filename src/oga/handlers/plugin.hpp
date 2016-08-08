@@ -16,32 +16,11 @@
 // Refer to the README and COPYING files for full details of the license.
 //
 
-#include <oga/core/agent.hpp>
-#include <oga/core/detail/config_loader.hpp>
-
-#ifndef OVIRT_AGENT_VERSION
-#   define OVIRT_AGENT_VERSION "development"
-#endif
+#ifndef GUARD_OGA_HANDLERS_PLUGIN_HPP_INCLUDED
+#define GUARD_OGA_HANDLERS_PLUGIN_HPP_INCLUDED
 
 namespace oga {
-namespace core {
 
-agent::agent()
-: config_(detail::load_application_config())
-, logger_()
-, connection_()
-, loop_(connection_)
-{
-    oga::log::configure(config_);
-    logger_ = oga::log::get("agent");
-    OGA_LOG_INFO(logger_, "ovirt-guest-agent started - Version: {0}") % OVIRT_AGENT_VERSION;	
 }
 
-agent::~agent()
-{
-    OGA_LOG_INFO(logger_, "ovirt-guest-agent ended");
-}
-
-
-
-}}
+#endif //GUARD_OGA_HANDLERS_PLUGIN_HPP_INCLUDED

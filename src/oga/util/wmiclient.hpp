@@ -33,7 +33,7 @@ class wmi_client {
 public:
     wmi_client(oga::log::logger_ptr logger);
     virtual ~wmi_client();
-
+	
     oga::error_type connect();
 	oga::error_type disconnect();
 
@@ -46,6 +46,8 @@ public:
 
 	oga::error_type get_names(std::vector<std::string> & names,
 							  std::string const & table_name);
+
+	static void clear_caches();
 protected:
     oga::log::logger_ptr logger_;
     _com_ptr_t<_com_IIID<IWbemLocator, &IID_IWbemLocator> > locator_;
