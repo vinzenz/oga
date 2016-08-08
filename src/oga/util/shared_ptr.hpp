@@ -32,11 +32,11 @@ void deleter(T * p) {
 }
 
 struct shared_ptr_aux {
-	shared_ptr_aux(size_t count_) : count(count_) {}
-	virtual ~shared_ptr_aux() {}
+    shared_ptr_aux(size_t count_) : count(count_) {}
+    virtual ~shared_ptr_aux() {}
 
-	size_t count;
-	virtual void destroy() = 0;
+    size_t count;
+    virtual void destroy() = 0;
 };
 
 template< typename T >
@@ -45,37 +45,37 @@ class shared_ptr {
     friend class shared_ptr;
 
 
-	template< typename U, typename Closer>
-	struct holder : shared_ptr_aux {
-		Closer closer_;
-		U * ptr_;
+    template< typename U, typename Closer>
+    struct holder : shared_ptr_aux {
+        Closer closer_;
+        U * ptr_;
 
-		holder(U * ptr, Closer closer, size_t count)
-		: shared_ptr_aux(count)
-		, closer_(closer)
-		, ptr_(ptr) {
-		}
-		virtual void destroy() { closer_(ptr_); }
-	};
+        holder(U * ptr, Closer closer, size_t count)
+        : shared_ptr_aux(count)
+        , closer_(closer)
+        , ptr_(ptr) {
+        }
+        virtual void destroy() { closer_(ptr_); }
+    };
 public:
     template< typename CloserT >
     explicit shared_ptr(T * t, CloserT closer)
     : holder_(t != 0 ? new holder<T, CloserT>(t, closer, 1) : 0)
-	, ptr_(t)
+    , ptr_(t)
     {
     }
 
 
     explicit shared_ptr(T * t = 0)
     : holder_(t != 0 ? new holder<T, void(*)(T*)>(t, deleter<T>, 1) : 0)
-	, ptr_(t)
+    , ptr_(t)
     {
     }
 
     shared_ptr(shared_ptr const & rhs)
     : holder_(rhs.holder_)
-	, ptr_(rhs.ptr_)
-	{
+    , ptr_(rhs.ptr_)
+    {
         if(holder_) ++holder_->count;
     }
 
@@ -84,7 +84,7 @@ public:
     : holder_(rhs.holder_)
     , ptr_(rhs.ptr_)
     {
-		if (holder_) ++holder_->count;
+        if (holder_) ++holder_->count;
     }
 
     virtual ~shared_ptr() {
@@ -98,7 +98,7 @@ public:
 
     void swap(shared_ptr<T> & rhs) {
         std::swap(holder_, rhs.holder_);
-		std::swap(ptr_, rhs.ptr_);
+        std::swap(ptr_, rhs.ptr_);
     }
 
     template< typename CloserT>
@@ -145,7 +145,7 @@ protected:
         if(ptr_ && holder_) {
             if(--holder_->count == 0) {
                 if(ptr_) {
-					if (holder_) holder_->destroy();
+                    if (holder_) holder_->destroy();
                 }
                 delete holder_;
                 ptr_ = 0;
@@ -154,8 +154,8 @@ protected:
         }
     }
 protected:
+    shared_ptr_aux *holder_;
     T* ptr_;
-	shared_ptr_aux *holder_;
 };
 
 template< typename T >

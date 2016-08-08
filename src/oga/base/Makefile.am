@@ -29,6 +29,7 @@ liboga_base_la_SOURCES=\
 	logging_appender.cpp \
 	logging_formatter.cpp \
 	logging_logger.cpp \
+	timer_queue.cpp \
 	$(NULL)
 
 
@@ -41,5 +42,6 @@ liboga_base_la_SOURCES+=\
 	logging_appender.hpp \
 	process.hpp \
 	thread.hpp \
+	timer_queue.hpp \
 	types.hpp \
 	$(NULL)

@@ -16,4 +16,4 @@
 # Refer to the README and COPYING files for full details of the license.
 #
 
-SUBDIRS=proto comm base core util
+SUBDIRS=proto comm base core util handlers

@@ -27,6 +27,7 @@
 namespace oga {
 	class timer_queue_triggerable {
 	public:
+        virtual ~timer_queue_triggerable() {}
 		virtual void * id() const = 0;
 		virtual void trigger() = 0;
 	};
@@ -64,7 +65,6 @@ namespace oga {
 		void add(int64_t interval, oga::util::shared_ptr<timer_queue_triggerable> triggerable);				
 		void remove(void*);
 	protected:
-		uint64_t started_ = 0;
 		oga::util::shared_ptr<priority_queue> queue_;
 	private:
 		timer_queue(timer_queue const &);

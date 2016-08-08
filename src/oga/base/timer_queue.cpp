@@ -20,12 +20,34 @@
 #include <queue>
 #include <oga/base/thread.hpp>
 #include <time.h>
+#if defined(WIN32)
+#include <windows.h>
+#endif
 
 namespace oga {
-	int64_t get_time_in_millis() {		
 #if defined(WIN32)
-		return int64_t(::GetTickCount64());
-#else		
+    namespace {
+        struct perf_timer {
+            int64_t frequency_;
+            perf_timer() {
+                LARGE_INTEGER li;
+                QueryPerformanceFrequency(&li);
+                frequency_ = li.QuadPart;
+            }
+
+            int64_t get() {
+                LARGE_INTEGER li;
+                QueryPerformanceCounter(&li);
+                return li.QuadPart  / frequency_;
+            }
+        };
+    }
+#endif
+	int64_t get_time_in_millis() {
+#if defined(WIN32)
+        static perf_timer timer;
+        return timer.get();
+#else
 		timespec ts_start;
 		clock_gettime(CLOCK_MONOTONIC, &ts_start);
 		return (int64_t(ts_start.tv_sec) * 1000LL)
@@ -50,7 +72,7 @@ namespace oga {
 		timer_queue_entry,
 		std::vector<timer_queue_entry>,
 		by_next_time
-	> 
+	>
 	{
 		oga::critical_section lock;
 
@@ -61,8 +83,7 @@ namespace oga {
 
 
 	timer_queue::timer_queue()
-	: started_()
-	, queue_(new priority_queue())
+	: queue_(new priority_queue())
 	{}
 
 	timer_queue::~timer_queue()
@@ -70,11 +91,11 @@ namespace oga {
 
 	void timer_queue::add(int64_t interval, oga::util::shared_ptr<timer_queue_triggerable> triggerable) {
 		timer_queue_entry e;
-		e.interval = interval;		
+		e.interval = interval;
 		e.next_time = get_time_in_millis() + interval;
 		e.triggerable = triggerable;
 		scoped_lock<critical_section> lock(queue_->lock);
-		queue_->push(e);		
+		queue_->push(e);
 	}
 
 	void timer_queue::remove(void * id) {
