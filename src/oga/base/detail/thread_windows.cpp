@@ -31,10 +31,10 @@ typedef struct {
 } THREADNAME_INFO;
 
 #if defined(_MSC_VER)
-struct EXCEPTION_REGISTRATION_RECORD {
+typedef struct _EXCEPTION_REGISTRATION_RECORD {
     _EXCEPTION_REGISTRATION_RECORD* Next;
     PVOID Handler;
-};
+} EXCEPTION_REGISTRATION_RECORD;
 #endif
 #include <poppack.h>
 
@@ -97,12 +97,15 @@ namespace oga {
             EXCEPTION_REGISTRATION_RECORD rec = {};
             rec.Next = tib->ExceptionList;
             rec.Handler = oga_seh_ignore_handler;
+            tib->ExceptionList = &rec;
+
             RaiseException(
                 MS_VC_EXCEPTION,
                 0,
                 sizeof(info) / sizeof(ULONG_PTR),
                 (ULONG_PTR*)&info
             );
+            tib->ExceptionList = tib->ExceptionList->Next;
         }
 
 		void name(char const * value) {
