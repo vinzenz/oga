@@ -20,6 +20,21 @@
 #if defined(_WIN32)
 #include <windows.h>
 #include <process.h>
+#include <winnt.h>
+
+#include <pshpack8.h>
+typedef struct {
+    DWORD dwType;
+    LPCSTR szName;
+    DWORD dwThreadID;
+    DWORD dwFlags;
+} THREADNAME_INFO;
+
+struct EXCEPTION_REGISTRATION_RECORD {
+    _EXCEPTION_REGISTRATION_RECORD* Next;
+    PVOID Handler;
+};
+#include <poppack.h>
 
 namespace oga {
 	namespace this_thread {
@@ -54,31 +69,38 @@ namespace oga {
 				return reinterpret_cast<T *>(c.ptr);
 			}
 		}
-
-        const DWORD MS_VC_EXCEPTION = 0x406D1388;
-#pragma pack(push,8)
-        typedef struct tagTHREADNAME_INFO
+ 
+        static EXCEPTION_DISPOSITION NTAPI oga_seh_ignore_handler(
+            EXCEPTION_RECORD *rec,
+            void *frame, CONTEXT *ctx,
+            void *disp)
         {
-            DWORD dwType; // Must be 0x1000.
-            LPCSTR szName; // Pointer to name (in user addr space).
-            DWORD dwThreadID; // Thread ID (-1=caller thread).
-            DWORD dwFlags; // Reserved for future use, must be zero.
-        } THREADNAME_INFO;
-#pragma pack(pop)
+            return ExceptionContinueExecution;
+        }
+
         void SetThreadName(DWORD dwThreadID, const char* threadName) {
+            if (!IsDebuggerPresent()) {
+                return;
+            }
+
+            const DWORD MS_VC_EXCEPTION = 0x406D1388;
+
             THREADNAME_INFO info;
             info.dwType = 0x1000;
             info.szName = threadName;
             info.dwThreadID = dwThreadID;
             info.dwFlags = 0;
-#pragma warning(push)
-#pragma warning(disable: 6320 6322)
-            __try {
-                RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
-            }
-            __except (EXCEPTION_EXECUTE_HANDLER) {
-            }
-#pragma warning(pop)
+            
+            NT_TIB * tib = ((NT_TIB*)NtCurrentTeb());
+            EXCEPTION_REGISTRATION_RECORD rec = {};
+            rec.Next = tib->ExceptionList;
+            rec.Handler = oga_seh_ignore_handler;
+            RaiseException(
+                MS_VC_EXCEPTION,
+                0,
+                sizeof(info) / sizeof(ULONG_PTR),
+                (ULONG_PTR*)&info
+            );
         }
 
 		void name(char const * value) {
