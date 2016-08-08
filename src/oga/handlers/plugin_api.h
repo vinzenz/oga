@@ -1,5 +1,6 @@
 
 #include <oga/base/types.hpp>
+#include <stddef.h>
 
 #if defined(__cplusplus)
 extern "C" {

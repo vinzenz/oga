@@ -24,11 +24,11 @@ oga2_SOURCES=main.cpp
 oga2_CXXFLAGS=$(AM_CXXFLAGS) $(OGA_CXX_FLAGS)
 oga2_LDFLAGS=$(AM_LDFLAGS) $(OGA_LDFLAGS)
 oga2_LDADD= \
-	oga/base/liboga-base.la \
 	oga/core/liboga-core.la \
-	oga/comm/liboga-comm.la \
 	oga/handlers/liboga-handlers.la \
 	oga/proto/config/liboga-proto-config.la \
-	oga/proto/json/liboga-proto-json.la \
+	oga/comm/liboga-comm.la \
 	oga/util/liboga-util.la \
+	oga/proto/json/liboga-proto-json.la \
+	oga/base/liboga-base.la \
 	$(NULL)

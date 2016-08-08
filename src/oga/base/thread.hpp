@@ -11,92 +11,92 @@ namespace oga {
         thread_handle handle();
         std::string name();
     }
-	
-	class thread;
-	void thread_runner(thread*);
 
-	class thread {
-		std::string const name_;
-		bool stop_;
-		thread_handle handle_;
-	public:
-		thread(std::string const & name);
-		virtual ~thread();
+    class thread;
+    void thread_runner(thread*);
 
-		void start();
-		void stop();
-		
-		error_type wait(size_t const milliseconds = ~size_t(0));
+    class thread {
+        std::string const name_;
+        bool stop_;
+        thread_handle handle_;
+    public:
+        thread(std::string const & name);
+        virtual ~thread();
 
-		thread_handle handle() const;
-	protected:
-		bool shoul_stop() const;
+        void start();
+        void stop();
 
-		virtual void run() = 0;
-		friend void oga::thread_runner(thread *);
-	private:
-		thread(thread const &);
-		thread & operator=(thread const &);
-	};
+        error_type wait(size_t const milliseconds = ~size_t(0));
 
-	class critical_section {
-	public:
-		critical_section();
-		~critical_section();
+        thread_handle handle() const;
+    protected:
+        bool shoul_stop() const;
 
-		bool try_lock() const;
-		void lock() const;
-		void unlock() const;
+        virtual void run() = 0;
+        friend void oga::thread_runner(thread *);
+    private:
+        thread(thread const &);
+        thread & operator=(thread const &);
+    };
 
-	protected:
+    class critical_section {
+    public:
+        critical_section();
+        ~critical_section();
+
+        bool try_lock() const;
+        void lock() const;
+        void unlock() const;
+
+    protected:
 #if defined(WIN32)
-		mutable CRITICAL_SECTION lock_;
+        mutable CRITICAL_SECTION lock_;
 #else
-		mutable pthread_mutex_t lock;
+        mutable pthread_mutex_t lock_;
 #endif
-	private:
-		// Not copyable
-		critical_section(critical_section const &);
-		critical_section & operator=(critical_section const &);
-	};
+    private:
+        // Not copyable
+        critical_section(critical_section const &);
+        critical_section & operator=(critical_section const &);
+    };
 
-	template< typename Lockable >
-	class scoped_lock {
-		Lockable & lock_;
-	public:
-		scoped_lock(Lockable & lock) : lock_(lock) {
-			lock_.lock();
-		}
+    template< typename Lockable >
+    class scoped_lock {
+        Lockable & lock_;
+    public:
+        scoped_lock(Lockable & lock) : lock_(lock) {
+            lock_.lock();
+        }
 
-		~scoped_lock() {
-			lock_.unlock();
-		}
-	private:
-		scoped_lock(scoped_lock const &);
-		scoped_lock & operator=(scoped_lock const &);
-	};
+        ~scoped_lock() {
+            lock_.unlock();
+        }
+    private:
+        scoped_lock(scoped_lock const &);
+        scoped_lock & operator=(scoped_lock const &);
+    };
 
-	class event {
-	public:
-		event(bool manual_reset = false);
-		virtual ~event();
+    class event {
+    public:
+        event(bool manual_reset = false);
+        virtual ~event();
 
-		bool wait(int64_t time_millis = -1);
-		void set();
-		void reset();
-	protected:
+        bool wait(int64_t time_millis = -1);
+        void set();
+        void reset();
+    protected:
 #if defined(WIN32)
-		HANDLE handle_;
+        HANDLE handle_;
 #else
-		bool signaled_;
-		bool manual_;
-		pthread_cond_t cond_;
-		pthread_mutex_t lock_;
-#endif		
-	private:
-		event(event const &);
-		event & operator=(event const &);
-	};
+        bool signaled_;
+        bool manual_;
+        pthread_cond_t cond_;
+        pthread_mutex_t lock_;
+#endif
+    private:
+        event(event const &);
+        event & operator=(event const &);
+    };
 }
 
 #endif //GUARD_OGA_BASE_THREAD_HPP_INCLUDED
