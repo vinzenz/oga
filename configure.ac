@@ -86,6 +86,7 @@ AC_CONFIG_FILES([
     src/oga/base/Makefile
     src/oga/comm/Makefile
     src/oga/core/Makefile
+    src/oga/handlers/Makefile
     src/oga/proto/Makefile
     src/oga/proto/config/Makefile
     src/oga/proto/json/Makefile
