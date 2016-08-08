@@ -73,9 +73,11 @@ namespace oga {
 		}
  
         static EXCEPTION_DISPOSITION NTAPI oga_seh_ignore_handler(
-            EXCEPTION_RECORD *rec,
-            void *frame, CONTEXT *ctx,
-            void *disp)
+            EXCEPTION_RECORD *,
+            void *,
+            CONTEXT *,
+            void *
+        )
         {
             return ExceptionContinueExecution;
         }

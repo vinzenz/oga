@@ -49,6 +49,61 @@ namespace oga {
         }
     }
 
+    thread::thread(std::string const & name)
+    : name_(name)
+    , stop_(false)
+    , handle_(0)
+    {}
+
+    thread::~thread()
+    {
+        stop(true);
+    }
+
+    void thread::start()
+    {
+        if (handle_ == 0) {
+            ::pthread_create(&handle_, 0, thread_runner, this);
+        }
+    }
+
+    void thread::stop(bool should_wait)
+    {
+        if (handle_ != 0) {
+            stop_ = true;
+            if (should_wait) {
+                ::pthread_join(handle_, 0);
+            }
+        }
+    }
+
+    error_type thread::wait(size_t const milliseconds) {
+
+        if (milliseconds == ~size_t(0)) {
+            ::pthread_join(handle_, 0);
+        }
+        else {
+            timespec ts;
+            clock_gettime(CLOCK_REALTIME, &ts);
+            ts.tv_sec += milliseconds / 1000;
+            ts.tv_nsec += (milliseconds % 1000) * 1000000;
+            int ret = ::pthread_timedjoin_np(&handle_, 0, &ts);
+            if (ret == ETIMEDOUT) {
+                return sys_error(ETIMEDOUT);
+            }
+        }
+
+        return oga::success();
+    }
+
+    thread_handle thread::handle() const {
+        return handle_;
+    }
+    bool thread::should_stop() const {
+        return stop_;
+    }
+
+
     critical_section::critical_section()
     : lock_()
     {
