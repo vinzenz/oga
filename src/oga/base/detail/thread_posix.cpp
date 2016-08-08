@@ -1,5 +1,5 @@
 //
-// Copyright 2014 Vinzenz Feenstra, Red Hat, Inc. and/or its affiliates.
+// Copyright 2014-2016 Vinzenz Feenstra, Red Hat, Inc. and/or its affiliates.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,6 +46,10 @@ namespace oga {
             if (n) {
                 pthread_setname_np(pthread_self(), n);
             }
+        }
+
+        void sleep(uint64_t time_ms) {
+            usleep(time_ms * 1000);
         }
     }
 

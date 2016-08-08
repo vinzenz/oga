@@ -10,6 +10,7 @@ namespace oga {
         thread_id id();
         thread_handle handle();
         std::string name();
+        void sleep(uint64_t time_ms);
     }
 
     class thread;

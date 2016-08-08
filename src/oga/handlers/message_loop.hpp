@@ -1,5 +1,5 @@
 //
-// Copyright 2014 Vinzenz Feenstra, Red Hat, Inc. and/or its affiliates.
+// Copyright 2014-2016 Vinzenz Feenstra, Red Hat, Inc. and/or its affiliates.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,15 +24,32 @@
 #include <oga/base/timer_queue.hpp>
 
 namespace oga {
-	class message_loop {
+	class message_loop : public thread {
 		oga::timer_queue timer_;
 		oga::comm::connection & connection_;
 		oga::message_manager messages_;
 	public:
 		message_loop(oga::comm::connection & connection)
-			: connection_(connection)
-			, messages_()
-		{}
+		: thread("message_loop")
+        , connection_(connection)
+		, messages_()
+		{
+            start();
+        }
+
+        void startup() {
+            start();
+        }
+
+        void shutdown() {
+            stop();
+            connection_.close();
+            wait();
+        }
+
+        ~message_loop() {
+            shutdown();
+        }
 
 		void add_timer(int64_t interval, oga::util::shared_ptr<handler> handler) {
 			timer_.add(interval, handler.ptr());
@@ -48,6 +65,29 @@ namespace oga {
 		void del_command(std::string const & name) {
 			messages_.drop(name);
 		}
+    private:
+        void run() {
+            while (!should_stop()) {
+                oga::proto::json::object message;
+                error_type result = connection_.receive(message);
+                if (result.code() == 0) {
+                    if (message.is_string("__name__")) {
+                        std::string name = message["__name__"].get_string();
+                        message.erase("__name__");
+                        try {
+                            messages_.dispatch_message(name, message);
+                        }
+                        catch (...) {
+                            OGA_LOG_ERROR(log::get("message_loop"), "Unhandled exception caught while handling: {0} args: {1}") % name % message;
+                        }
+                    }
+                }
+                else {
+                    OGA_LOG_INFO(log::get("message_loop"), "Failed to receive message from connection. Code: {0} Message: {1}") % result.code() % result.message();
+                    this_thread::sleep(1000);
+                }
+            }
+        }
 	};
 }
 

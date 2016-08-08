@@ -1,5 +1,5 @@
 //
-// Copyright 2014 Vinzenz Feenstra, Red Hat, Inc. and/or its affiliates.
+// Copyright 2014-2016 Vinzenz Feenstra, Red Hat, Inc. and/or its affiliates.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -76,6 +76,10 @@ error_type implementation_base::receive(connection::message_type & message) {
             return result;
         }
     }
+    if (result.code() != kAppErrSuccess) {
+        return result;
+    }
+
     oga::proto::json::value value;
     if(!parse(line.c_str(), line.c_str() + line.size(), value)) {
         return app_error(kAppErrInvalidMessage, kESevWarning);

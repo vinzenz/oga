@@ -1,5 +1,5 @@
 //
-// Copyright 2014 Vinzenz Feenstra, Red Hat, Inc. and/or its affiliates.
+// Copyright 2014-2016 Vinzenz Feenstra, Red Hat, Inc. and/or its affiliates.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <oga/base/error_def.hpp>
 
 #if defined(WIN32) || defined(WIN64)
+#   include <oga/util/encoding.hpp>
 #   include <windows.h>
 #else
 #   include <errno.h>
@@ -32,21 +33,25 @@ public:
     std::string message(int32_t code) const {
 #if defined(WIN32) || defined(WIN64)
         std::string result;
-        LPSTR text = 0;
-        DWORD err = ::FormatMessageA(
+        LPWSTR text = 0;
+        DWORD count = ::FormatMessageW(
                   FORMAT_MESSAGE_FROM_SYSTEM
                 | FORMAT_MESSAGE_ALLOCATE_BUFFER
                 | FORMAT_MESSAGE_IGNORE_INSERTS,
                 0,
                 DWORD(code),
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                (LPSTR)&text,
+                (LPWSTR)&text,
                 0,
 				0);
-        if(err == ERROR_SUCCESS && text != 0) {
-            result.assign(text);
+        if(count > 0 && text != 0) {
+            result = util::utf16_to_utf8(text, text + count);
             ::LocalFree(text);
-        }
+            size_t end = result.find_last_not_of("\n\r");
+            if (end != std::string::npos) {
+                result.substr(0, end).swap(result);
+            }
+        }        
         return result;
 #else
         return strerror(code);
