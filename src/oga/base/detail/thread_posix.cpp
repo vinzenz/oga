@@ -23,7 +23,7 @@
 #include <sys/syscall.h>
 #include <memory.h>
 #include <errno.h>
-
+#include <stdio.h>
 namespace oga {
     namespace this_thread {
 
@@ -49,6 +49,18 @@ namespace oga {
         }
     }
 
+    void thread_runner(thread * t) {
+        if(!t->name_.empty()) {
+            this_thread::name(t->name_.c_str());
+        }
+        t->run();
+    }
+
+    static void* oga_thread_runner_posix(void * arg) {
+        thread_runner(reinterpret_cast<thread*>(arg));
+        return 0;
+    }
+
     thread::thread(std::string const & name)
     : name_(name)
     , stop_(false)
@@ -63,7 +75,14 @@ namespace oga {
     void thread::start()
     {
         if (handle_ == 0) {
-            ::pthread_create(&handle_, 0, thread_runner, this);
+            if(::pthread_create(
+                    &handle_,
+                    0,
+                    oga_thread_runner_posix,
+                    static_cast<thread*>(this)
+            ) == 0) {
+                pthread_detach(handle_);
+            }
         }
     }
 
@@ -72,27 +91,29 @@ namespace oga {
         if (handle_ != 0) {
             stop_ = true;
             if (should_wait) {
-                ::pthread_join(handle_, 0);
+                wait();
             }
         }
     }
 
     error_type thread::wait(size_t const milliseconds) {
-
+        if(handle_ == 0) {
+            return success();
+        }
+        int ret = 0;
         if (milliseconds == ~size_t(0)) {
-            ::pthread_join(handle_, 0);
+            ret = ::pthread_join(handle_, 0);
         }
         else {
             timespec ts;
             clock_gettime(CLOCK_REALTIME, &ts);
             ts.tv_sec += milliseconds / 1000;
             ts.tv_nsec += (milliseconds % 1000) * 1000000;
-            int ret = ::pthread_timedjoin_np(&handle_, 0, &ts);
+            ret = ::pthread_timedjoin_np(handle_, 0, &ts);
             if (ret == ETIMEDOUT) {
                 return sys_error(ETIMEDOUT);
             }
         }
-
         return oga::success();
     }
 
@@ -122,7 +143,7 @@ namespace oga {
     bool critical_section::try_lock() const {
         return ::pthread_mutex_trylock(&lock_) == 0;
     }
-    
+
     void critical_section::lock() const {
         ::pthread_mutex_lock(&lock_);
     }
