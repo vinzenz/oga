@@ -55,8 +55,37 @@ namespace oga {
 			}
 		}
 
+        const DWORD MS_VC_EXCEPTION = 0x406D1388;
+#pragma pack(push,8)
+        typedef struct tagTHREADNAME_INFO
+        {
+            DWORD dwType; // Must be 0x1000.
+            LPCSTR szName; // Pointer to name (in user addr space).
+            DWORD dwThreadID; // Thread ID (-1=caller thread).
+            DWORD dwFlags; // Reserved for future use, must be zero.
+        } THREADNAME_INFO;
+#pragma pack(pop)
+        void SetThreadName(DWORD dwThreadID, const char* threadName) {
+            THREADNAME_INFO info;
+            info.dwType = 0x1000;
+            info.szName = threadName;
+            info.dwThreadID = dwThreadID;
+            info.dwFlags = 0;
+#pragma warning(push)
+#pragma warning(disable: 6320 6322)
+            __try {
+                RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER) {
+            }
+#pragma warning(pop)
+        }
+
 		void name(char const * value) {
 			if (GetCurrentTIB()->ArbitraryUserPointer == 0) {
+                if (value != 0) {
+                    SetThreadName(GetCurrentThreadId(), value);
+                }
 				GetCurrentTIB()->ArbitraryUserPointer = const_cast<char*>(value);
 			}
 		}
@@ -95,7 +124,9 @@ namespace oga {
 	}
 
 	thread::~thread()
-	{}
+	{
+        stop(true);
+    }
 
 	void thread::start() {
 		if (handle_ == INVALID_HANDLE_VALUE) {
@@ -106,11 +137,13 @@ namespace oga {
 		}
 	}
 
-	void thread::stop() {
+	void thread::stop(bool should_wait) {
 		if (handle_ != INVALID_HANDLE_VALUE) {
-			stop_ = false;
-			wait();
-		}
+            stop_ = true;
+            if (should_wait) {
+                wait();
+            }
+        }
 	}
 
 	error_type thread::wait(size_t milliseconds) {
@@ -135,6 +168,10 @@ namespace oga {
 		}
 		return get_last_system_error();
 	}
+
+    bool thread::should_stop() const {
+        return stop_;
+    }
 
 	critical_section::critical_section()
 		: lock_() {

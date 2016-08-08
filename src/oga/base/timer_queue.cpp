@@ -83,11 +83,55 @@ namespace oga {
 
 
 	timer_queue::timer_queue()
-	: queue_(new priority_queue())
-	{}
+	: thread("timer_queue")
+    , queue_(new priority_queue())
+    , event_()
+	{
+        start();
+    }
 
 	timer_queue::~timer_queue()
-	{}
+	{
+        stop();
+        event_.set();
+    }
+
+    int64_t timer_queue::get_wait_time() {
+        scoped_lock<critical_section> lock(queue_->lock);
+        if (queue_->container().size() == 0) {
+            return -1;
+        }
+        int64_t result = queue_->top().next_time - get_time_in_millis();
+        if (result < 0) {
+            event_.set();
+        }
+        return result;
+    }
+
+    void timer_queue::run() {
+        while (!should_stop()) {
+            work();
+            event_.wait(get_wait_time());
+        }
+    }
+
+    void timer_queue::work() {
+        scoped_lock<critical_section> lock(queue_->lock);
+        int64_t now = get_time_in_millis();
+        while (!queue_->empty()) {
+            if (queue_->top().next_time > now) {
+                break;
+            }
+            timer_queue_entry e = queue_->top();
+            queue_->pop();
+
+            if (e.interval > 0) {
+                e.triggerable->trigger();
+                e.next_time = now + e.interval;
+                queue_->push(e);
+            }
+        }
+    }
 
 	void timer_queue::add(int64_t interval, oga::util::shared_ptr<timer_queue_triggerable> triggerable) {
 		timer_queue_entry e;
@@ -96,6 +140,7 @@ namespace oga {
 		e.triggerable = triggerable;
 		scoped_lock<critical_section> lock(queue_->lock);
 		queue_->push(e);
+        event_.set();
 	}
 
 	void timer_queue::remove(void * id) {
@@ -104,7 +149,7 @@ namespace oga {
 		for (size_t i = 0; i < count; ++i) {
 			if(queue_->container()[i].triggerable->id() == id) {
 				queue_->container()[i].interval = 0;
-				queue_->container()[i].next_time = get_time_in_millis();
+                return;
 			}
 		}
 	}

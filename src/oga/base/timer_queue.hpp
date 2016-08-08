@@ -21,6 +21,7 @@
 
 #include <oga/base/types.hpp>
 #include <oga/util/shared_ptr.hpp>
+#include <oga/base/thread.hpp>
 
 #include <vector>
 
@@ -51,10 +52,12 @@ namespace oga {
 		}
 	};
 	
-	class timer_queue {		
+	class timer_queue : public thread {
 	public:
 		timer_queue();		
 		virtual ~timer_queue();
+
+        void remove_all();
 		
 		template< typename Callable >
 		void add(int64_t interval, Callable * callable) {
@@ -66,6 +69,12 @@ namespace oga {
 		void remove(void*);
 	protected:
 		oga::util::shared_ptr<priority_queue> queue_;
+        oga::event event_;
+
+    protected:
+        virtual void run();
+        void work(); 
+        int64_t get_wait_time();
 	private:
 		timer_queue(timer_queue const &);
 		timer_queue & operator=(timer_queue const &);

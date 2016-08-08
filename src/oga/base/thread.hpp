@@ -24,13 +24,13 @@ namespace oga {
         virtual ~thread();
 
         void start();
-        void stop();
+        void stop(bool should_wait = false);
 
         error_type wait(size_t const milliseconds = ~size_t(0));
 
         thread_handle handle() const;
     protected:
-        bool shoul_stop() const;
+        bool should_stop() const;
 
         virtual void run() = 0;
         friend void oga::thread_runner(thread *);

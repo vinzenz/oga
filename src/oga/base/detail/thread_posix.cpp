@@ -48,6 +48,7 @@ namespace oga {
             }
         }
     }
+
     critical_section::critical_section()
     : lock_()
     {
